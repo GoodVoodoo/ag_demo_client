@@ -1,0 +1,254 @@
+=======================================================================
+Demo Clients - Library of demonstration clients for Audiogram gRPC API.
+=======================================================================
+
+===== Call Syntax =====
+    python -m clients.main {ARGS} [OPTIONS]
+    python -m clients.audio_archive {ARGS} [OPTIONS]
+
+===== Usage Restrictions =====
+    Minimum supported Python version: 3.11
+    Audio file format: WAV
+    Encoding: PCM (int16le)
+
+===== Available Clients =====
+
+    Generate template config file at FILE_PATH
+        python -m clients.main create-config FILE_PATH
+
+    File speech recognition
+        python -m clients.main recognize file --audio-file {path/to/file.wav} [COMMON_OPTIONS] [SR_OPTIONS] [SR_FILE_OPTIONS]
+
+    Stream speech recognition
+        python -m clients.main recognize stream --audio-file {path/to/file.wav} [COMMON_OPTIONS] [SR_OPTIONS] [SR_STREAM_OPTIONS]
+
+    File speech synthesis
+        python -m clients.main synthesize file --text "some text" --voice-name "someone" --model-type "light" [COMMON_OPTIONS] [TTS_OPTIONS]
+
+    Stream speech synthesis
+        python -m clients.main synthesize stream --text "some text" --voice-name "someone" --model-type "light" [COMMON_OPTIONS] [TTS_OPTIONS]
+
+    List available speech recognition models
+        python -m clients.main models recognize [COMMON_OPTIONS]
+
+    List available speech synthesis models
+        python -m clients.main models synthesize [COMMON_OPTIONS]
+
+    List SR requests in audio archive:
+        python -m clients.audio_archive list-requests --api-address "audio-archive.example.com" --client-id "sample-client-id" [LIST_AA_OPTIONS]
+
+    Download transcript from audio archive:
+        python -m clients.audio_archive download transcript --api-address "audio-archive.example.com" --client-id "sample-client-id" --request-id "SR-something-something" [DOWNLOAD_AA_OPTIONS]
+
+    Download VAD marks from audio archive:
+        python -m clients.audio_archive download vad-marks --api-address "audio-archive.example.com" --client-id "sample-client-id" --request-id "SR-something-something" [DOWNLOAD_AA_OPTIONS]
+
+    Download audio from audio archive:
+        python -m clients.audio_archive download audio --api-address "audio-archive.example.com" --client-id "sample-client-id" --request-id "SR-something-something" [DOWNLOAD_AA_OPTIONS]
+
+    NOTE:
+    All downloaded files from audio archive are stored in a separate directory (default: "./request_data/") with following structure:
+    - If request has no trace ID or session ID: "<save_dir>/client_id/request_id/"
+    - If request has trace ID: "<save_dir>/client_id/trace_id/request_id/"
+    - If request has session ID but no trace ID: "<save_dir>/client_id/session_id/request_id/" 
+
+===== Common Options (COMMON_OPTIONS) =====
+
+    --help
+        print help message and exit
+
+    --config {path_to_ini}
+        path to a config in .ini format
+
+        Configuration file can be used along with any common options.
+        When options are specified, they will override the same settings from the config file, if they exist.
+
+    --api-address {host[:port]}
+        (required)
+        network address to connect to Audiogram API in "host" or "host:port" format
+
+    --secure {true|false}
+        (required)
+        enable/disable SSL/TLS when connecting to a server
+
+    --ca-cert {path}
+        path to a PEM-encoded root certificates (CA certificates) file for secure connection to server
+
+    --cert-private-key {path}
+        path to a PEM-encoded private key file for secure connection to server
+
+    --cert-chain {path}
+        path to a PEM-encoded certificate chain file for secure connection to server
+
+    --timeout {float}
+        connection timeout in seconds
+
+    --client-id {string}
+        Keycloak client ID for authorization
+
+    --client-secret {string}
+        Keycloak client secret for authorization
+
+    --sso-url {url}
+        URL to connect to Keycloak for authorization
+
+    --realm {realm_name}
+        user's realm name in Keycloak
+
+    --iam-account {string}
+        account name in IAM
+
+    --iam-workspace {string}
+        workspace name in IAM, omit for default workspace
+
+
+    NOTE: Authentication will be disabled if --client-id and --client-secret are empty strings or not specified.
+          Otherwise, all Keycloak options are required.
+          All IAM options are not required, but PDP authorization will be used only if `--iam-account` is specified.
+
+    NOTE: If required settings (e.g. api_address) are set in the config file - corresponding CLI options are not required.
+
+===== Speech Recognition Options (SR_OPTIONS) =====
+
+    --audio-file {path}
+        (required)
+        path to a PCM WAV (int16le) audio file for recognition
+
+    --model {model_name}
+        set speech recognition model to use
+
+    --enable-word-time-offsets
+        request per-word start and end time offsets to be specified for each recognized phrase
+
+    --enable-punctuator
+        request automatic punctuation of recognized text
+
+    --enable-denormalization
+        request number denormalization (convert text numbers to actual numbers)
+
+    --enable-speaker-labeling
+        request speaker labeling by ID
+
+    --enable-genderage
+        request recognition of speaker's gender, age and emotion
+
+    --enable-antispoofing
+        request detection of spoofing attacks
+
+    --va-response-mode {choice}
+        set how voice activity (VA) labels will be returned
+        "enable" - return VA labels together with recognition responses (synchronously)
+        "enable-async" - return VA labels in separate responses (asynchronously)
+        "disable" - do not return VA labels
+
+    --use-va-algo {vad|dep|disable}
+        select/disable voice activity detection algorithm
+        "vad" - select VAD algorithm
+        "dep" - select DEP algorithm
+        "disable" - disable voice activity detection
+        
+    --vad-mode {default|only-speech|split-by-pauses}
+        set VAD mode
+        "default" - use default (file: only-speech | stream: split-by-pauses)
+
+    --vad-threshold {float}
+        set VAD threshold
+
+    --vad-min-silence-ms {int}
+        set minimal silence duration for VAD in milliseconds
+
+    --vad-speech-pad-ms {int}
+        set speech padding for VAD in milliseconds
+
+    --vad-min-speech-ms {int}
+        set minimal speech duration for VAD in milliseconds
+
+    --dep-smoothed-window-threshold {float}
+        set smoothed window threshold for DEP
+
+    --dep-smoothed-window-ms {int}
+        set smoothed window duration for DEP in milliseconds
+
+    --as-attack-type {choice}
+        set attack type that antispoofing will search for
+        "logical" - synthesized or artificially made audio
+        "physical" - audio replayed from some device
+        "all-types" - logical and physical attacks
+
+    --as-far {float}
+        (must not be used with `--as-frr`)
+        set max allowed False Acceptance Rate (rate of not detected attacks) for antispoofing
+
+    --as-frr {float}
+        (must not be used with `--as-far`)
+        set max allowed False Rejection Rate (rate of normal audio detected as attacks) for antispoofing
+
+    --as-max-duration-for-analysis {int}
+        (must be >= 0)
+        set max audio chunk length in milliseconds for antispoofing
+
+    --speakers-max {int}
+        (must be >= 0)
+        (must not be used with `--speakers-num`)
+        hint for speaker labeling model about max amount of speakers that might be present in audio
+
+    --speakers-num {int}
+        (must be >=0)
+        (must not be used with `--speakers-max`)
+        hint for speaker labeling model that certain amount of speakers present in audio
+
+    --dictionary-name {str}
+        set wFST dictionary name to be used (available dictionaries can be listed via get_models_info)
+
+    --dictionary-weight {float}
+        (default: 0)
+        (must be in range [-1, 1])
+        set weight for specified wFST dictionary
+
+===== File Speech Recognition Options (SR_FILE_OPTIONS) =====
+
+    --split-by-channel
+        perform recognition separately for each audio channel
+
+===== Speech Recognition Options (SR_OPTIONS) =====
+
+    --interim-results
+        request interim recognition results to be returned
+
+    --single-utterance
+        recognize only the first detected phrase
+
+    --rt
+        mimic realtime audio sending - wait for the duration of sent chunk before sending another
+
+    --chunk-len {int}
+        set sending chunk length in milliseconds (between 500 and 2000 ms)
+
+===== Text-To-Speech Options (TTS_OPTIONS) =====
+
+    --text {text}
+        (required)
+        text or SSML (requires --read-ssml flag) to synthesize
+
+    --voice-name {name}
+        (required)
+        voice name for synthesis
+
+    --model-type {type}
+        set voice synthesis model type
+        if not specified - model will be chosen automatically
+
+    --save-to {path}
+        path to file to save synthesized audio
+
+    --read-ssml
+        treat provided --text as SSML (Speech Synthesis Markup Language)
+
+    --sample-rate {int}
+        set output audio sample rate in Hz
+
+    --model-sample-rate {int}
+        request model with set audio sample rate in Hz
+
+    --voice-style {neutral|happy|angry|sad|surprised}
+        request certain emotional coloring of synthesized voice

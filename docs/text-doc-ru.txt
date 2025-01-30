@@ -1,0 +1,254 @@
+=======================================================================
+Demo Clients - Библиотека демонстрационных клиентов для Audiogram gRPC API.
+=======================================================================
+
+===== Синтаксис вызова =====
+    python -m clients.main {ARGS} [OPTIONS]
+    python -m clients.audio_archive {ARGS} [OPTIONS]
+
+===== Ограничения =====
+    Минимальная версия Python: 3.11
+    Формат аудио: WAV
+    Кодировка: PCM (int16le)
+
+===== Доступные клиенты =====
+
+    Сгенерировать шаблонный конфиг в указанный через FILE_PATH файл
+        python -m clients.main create-config FILE_PATH
+
+    Файловое распознавание голоса
+        python -m clients.main recognize file --audio-file {path/to/file.wav} [COMMON_OPTIONS] [SR_OPTIONS] [SR_FILE_OPTIONS]
+
+    Потоковое распознавание голоса
+        python -m clients.main recognize stream --audio-file {path/to/file.wav} [COMMON_OPTIONS] [SR_OPTIONS] [SR_STREAM_OPTIONS]
+
+    Файловый синтез голоса
+        python -m clients.main synthesize file --text "some text" --voice-name "someone" --model-type "light" [COMMON_OPTIONS] [TTS_OPTIONS]
+
+    Потоковый синтез голоса
+        python -m clients.main synthesize stream --text "some text" --voice-name "someone" --model-type "light" [COMMON_OPTIONS] [TTS_OPTIONS]
+
+    Получить список всех доступных моделей для распознавания голоса
+        python -m clients.main models recognize [COMMON_OPTIONS]
+
+    Получить список всех доступных моделей для синтеза голоса
+        python -m clients.main models synthesize [COMMON_OPTIONS]
+
+    Получить список запросов на распознавание речи в аудиоархиве:
+        python -m clients.audio_archive list-requests --api-address "audio-archive.example.com" --client-id "sample-client-id" [LIST_AA_OPTIONS]
+
+    Скачать расшифровку из аудиоархива:
+        python -m clients.audio_archive download transcript --api-address "audio-archive.example.com" --client-id "sample-client-id" --request-id "SR-something-something" [DOWNLOAD_AA_OPTIONS]
+
+    Скачать VAD-метки из аудиоархива:
+        python -m clients.audio_archive download vad-marks --api-address "audio-archive.example.com" --client-id "sample-client-id" --request-id "SR-something-something" [DOWNLOAD_AA_OPTIONS]
+
+    Скачать аудио из аудиоархива:
+        python -m clients.audio_archive download audio --api-address "audio-archive.example.com" --client-id "sample-client-id" --request-id "SR-something-something" [DOWNLOAD_AA_OPTIONS]
+
+    NOTE:
+    Все загруженные файлы из аудиоархива хранятся в отдельном каталоге (по умолчанию: "./request_data/") со следующей структурой:
+    - Если запрос не имеет trace_id или session_id: "<save_dir>/client_id/request_id/"
+    - Если запрос содержит trace_id: "<save_dir>/client_id/trace_id/request_id/"
+    - Если у запроса есть session_id, но нет trace_id: "<save_dir>/client_id/session_id/request_id/" 
+
+===== Общие опции и флаги (COMMON_OPTIONS) =====
+
+    --help
+        вывести help
+
+    --config {path_to_ini}
+        путь до конфигурационного файла в .ini формате
+
+        Конфиг-файл может быть использован совместно с любыми другими опциями.
+        В этом случае настройки из опций будут использованы вместо соответствующих настроек из конфига.
+
+    --api-address {host[:port]}
+        (обязательная)
+        сетевой адрес для подключения к Audiogram API в формате "host" или "host:port"
+
+    --secure {true|false}
+        (обязательная)
+        включить/отключить SSL/TLS при подключении к серверу
+
+    --ca-cert {path}
+        путь до файла с корневыми сертификатами (сертификатами ЦА) в формате PEM для безопасного подключения к серверу
+
+    --cert-private-key {path}
+        путь до файла с закрытым ключом в формате PEM для безопасного подключения к серверу
+
+    --cert-chain {path}
+        путь до файла с цепочкой сертификатов в формате PEM для безопасного подключения к серверу
+
+    --timeout {float}
+        таймаут соединения с сервером в секундах
+
+    --client-id {string}
+        Keycloak Client ID для авторизации
+
+    --client-secret {string}
+        Keycloak Client Secret для авторизации
+
+    --sso-url {url}
+        URL для подключения к Keycloak для авторизации
+
+    --realm {realm_name}
+        Keycloak Realm для авторизации
+
+    --iam-account {string}
+        имя аккаунта для IAM
+
+    --iam-workspace {string}
+        название workspace для IAM, не указывать для использования workspace по-умолчанию
+
+
+    NOTE: Авторизация отключается если --client-id и --client-secret не указаны или являются пустыми строками.
+          В противном случае все опции Keycloak обязательны для авторизации.
+          Все опции IAM не обязательны, но для включения авторизации через PDP необходимо указать `--iam-account`.
+
+    NOTE: Если обязательные настройки (например api_address) указаны в конфиге - соответствующие опции указывать не нужно.
+
+===== Опции для распознавания голоса (SR_OPTIONS) =====
+
+    --audio-file {path}
+        (обязательная)
+        путь к аудио-файлу для распознавания
+
+    --model {model_name}
+        установить имя модели для распознавания
+
+    --enable-word-time-offsets
+        запросить метки начала и конца для каждого слова распознанной фразы
+
+    --enable-punctuator
+        запросить автоматическую расстановку пунктуации
+
+    --enable-denormalization
+        запросить денормализацию чисел (преобразование текстовых чисел в реальные)
+
+    --enable-speaker-labeling
+        запросить маркировку спикера по ID
+
+    --enable-genderage
+        запросить распознавание пола, возраста и эмоции говорящего
+
+    --enable-antispoofing
+        запросить определение спуфинг-атак
+
+    --va-response-mode {enable|enable-async|disable}
+        установить как будут возвращаться метки голосовой активности (VA метки)
+        "enable" - возвращать вместе с распознанными фразами (синхронно)
+        "enable-async" - возвращать отдельными ответами (асинхронно)
+        "disable" - не возвращать вообще
+
+    --use-va-algo {vad|dep|disable}
+        выбрать/отключить метод обнаружения голосовой активности
+        "vad" - выбрать метод VAD
+        "dep" - выбрать метод DEP
+        "disable" - отключить обнаружение голосовой активности
+        
+    --vad-mode {default|only-speech|split-by-pauses}
+        установить режим VAD
+        "default" - use default (file: only-speech | stream: split-by-pauses)
+
+    --vad-threshold {float}
+        установить порог для VAD
+
+    --vad-min-silence-ms {int}
+        установить минимальную длительность тишины для VAD в миллисекундах
+
+    --vad-speech-pad-ms {int}
+        установить добавочное заполнение в начале и конце голоса для VAD в миллисекундах
+
+    --vad-min-speech-ms {int}
+        установить минимальную длительность голоса для VAD в миллисекундах
+
+    --dep-smoothed-window-threshold {float}
+        установить порог сглаженного окна для DEP
+
+    --dep-smoothed-window-ms {int}
+        установить длительность сглаженного окна для DEP в миллисекундах
+
+    --as-attack-type {choice}
+        установить тип атаки, который будет искать антиспуфинг
+        "logical" - синтезированное или склееное из кусков речи аудио
+        "physical" - аудио, воспроизведенное с какого-либо устройства
+        "all-types" - логические и физические атаки
+
+    --as-far {float}
+        (не должно быть использовано вместе с `--as-frr`)
+        установить максимально допустимую долю ложно-положительных классификаций антиспуфинга (доля незамеченных атак)
+
+    --as-frr {float}
+        (не должно быть использовано вместе с `--as-far`)
+        установить максимально допустимую долю ложно-отрицательных классификаций антиспуфинга (доля нормального аудио, помеченного как атака)
+
+    --as-max-duration-for-analysis {int}
+        (должно быть >= 0)
+        установить максимальный размер аудио-чанка, посылаемого в антиспуфинг в миллисекундах
+
+    --speakers-max {int}
+        (должно быть >= 0)
+        (не должно быть использовано вместе с `--speakers-num`)
+        подсказка для модели маркировки спикеров о максимальном количестве спикеров, которые могут присутствовать в аудио
+
+    --speakers-num {int}
+        (должно быть >= 0)
+        (не должно быть использовано вместе с `--speakers-max`)
+        подсказка для модели маркировки спикеров, в которой присутствует определенное количество спикеров в аудио
+
+    --dictionary-name {str}
+        установить имя используемого словаря wFST (список доступных словарей можно просмотреть с помощью get_models_info)
+
+    --dictionary-weight {float}
+        (по-умолчанию: 0)
+        (должно быть в диапазоне [-1, 1])
+        установить вес для указанного словаря wFST
+
+===== Опции файлового распознавания голоса (SR_FILE_OPTIONS) =====
+
+    --split-by-channel
+        распознавать каждый канал аудио отдельно
+
+===== Опции потокового распознавания голоса (SR_OPTIONS) =====
+
+    --interim-results
+        запросить промежуточные результаты распознавания
+
+    --single-utterance
+        распознавать только первую обнаруженную фразу
+
+    --rt
+        имитировать отправку аудио в реальном времени - ждать всю длину отосланного чанка перед отсылкой следующего
+
+    --chunk-len {int}
+        установить длину отправляемых чанков в миллисекундах (между 500 и 2000 мс)
+
+===== Опции синтеза голоса (TTS_OPTIONS) =====
+
+    --text {text}
+        (обязательная)
+        текст или SSML (требуется флаг --read-ssml) для синтеза
+
+    --voice-name {name}
+        (обязательная)
+        название голоса для синтеза
+
+    --model-type {type}
+        установить тип модели для синтеза голоса
+        если опция не указана - тип будет выбран автоматически
+
+    --save-to {path}
+        путь к файлу для сохранения синтезированного аудио
+
+    --read-ssml
+        интерпретировать --text как SSML (Speech Synthesis Markup Language)
+
+    --sample-rate {int}
+        установить частоту дискретизации выходного аудио в Гц
+
+    --model-sample-rate {int}
+        запросить модель с заданной частотой дискретизации аудио в Гц
+
+    --voice-style {neutral|happy|angry|sad|surprised}
+        запросить эмоциональную окраску синтезированного голоса
