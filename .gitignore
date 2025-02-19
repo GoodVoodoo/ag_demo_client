@@ -22,7 +22,6 @@ wheels/
 
 # Virtual Environment
 venv/
-env/
 ENV/
 
 # IDE
@@ -31,17 +30,13 @@ ENV/
 *.swp
 *.swo
 
+# OS
+.DS_Store
+Thumbs.db
+
 # Project specific
-*.wav
-*.mp3
-*.pcm
-request_data/
-*.log
+config copy.ini
 
 # Config files with sensitive data
 # Uncomment if you don't want to track config.ini
-config.ini
-
-# OS specific
-.DS_Store
-Thumbs.db 
+config.ini 

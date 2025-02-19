@@ -74,4 +74,4 @@ def analyze_changes():
         print(f'git commit -m "{commit_msg}"')
 
 if __name__ == "__main__":
-    analyze_changes()
+    analyze_changes()  
