@@ -13,6 +13,11 @@ This project provides client implementations for various services, with a focus 
 - Model information retrieval
 - Common utilities for authentication and configuration
 - gRPC client implementations
+- Audio Format Conversion
+  - Multiple format support (MP4, MP3, WAV, M4A, AAC, OGG, FLAC)
+  - Optimized output for speech recognition
+  - Video audio extraction
+  - Detailed media information
 
 ## Project Structure
 
@@ -30,13 +35,37 @@ This project provides client implementations for various services, with a focus 
 │   │   └── grpc.py        # gRPC client utilities
 │   └── main.py            # Main CLI implementation
 ├── TTSOutput/             # Directory for TTS output files
-└── Replay/               # Directory for replay files
+├── Replay/               # Directory for replay files
+├── audio_converter.py    # Audio format converter utility
+└── output/              # Default directory for converted audio files
 ```
 
 ## Prerequisites
 
-- Python 3.x
+- Python 3.8 or higher
 - Required Python packages (specified in pyproject.toml)
+- FFmpeg (required for audio conversion)
+
+### Installing FFmpeg (for audio conversion)
+
+#### Windows
+```bash
+# Using winget (Windows Package Manager)
+winget install Gyan.FFmpeg
+
+# Or download from the official website:
+# https://ffmpeg.org/download.html#build-windows
+```
+
+#### Linux
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install ffmpeg
+
+# Fedora
+sudo dnf install ffmpeg
+```
 
 ## Installation
 
@@ -101,4 +130,59 @@ For detailed options for each command, use the --help flag:
 python -m clients --help
 python -m clients synthesize --help
 python -m clients recognize --help
+```
+
+### Audio Format Conversion
+
+The project includes an audio converter utility that prepares audio files for speech recognition:
+
+```bash
+# Convert any supported audio/video file to WAV
+python audio_converter.py input_file.mp4
+
+# Specify custom output directory
+python audio_converter.py input_file.mp3 --output-dir my_output
+
+# List supported formats
+python audio_converter.py --list-formats
+```
+
+#### Supported Audio Formats
+- `.mp4` - Video files with audio
+- `.mp3` - MP3 audio
+- `.wav` - WAV audio
+- `.m4a` - M4A audio
+- `.aac` - AAC audio
+- `.ogg` - OGG audio
+- `.flac` - FLAC audio
+
+#### Output Format
+All audio is converted to a standardized format suitable for speech recognition:
+- Mono channel
+- 16kHz sample rate
+- 16-bit PCM WAV encoding
+
+#### Example Conversion Output
+```
+Processing file: input.mp4
+Input format: .mp4
+
+Video information:
+Resolution: 1920x1080
+Duration: 65.3 seconds
+Bitrate: 2500 kbps
+
+Audio information:
+Codec: aac
+Sample rate: 48000 Hz
+Channels: 2
+Bit rate: 128 kbps
+
+Converting to speech recognition format...
+Extracting and converting audio from video...
+Processing audio to speech recognition format...
+Converted to: C:\path\to\output\output.wav
+
+Success! Final WAV file: C:\path\to\output\output.wav
+The WAV file is now ready for speech recognition
 ```

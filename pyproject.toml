@@ -15,7 +15,8 @@ dependencies = [
     "tabulate>=0.9.0",
     "dynaconf[ini]>=3.2.4",
     "python-dotenv>=1.0.0",
-    "urllib3>=2.0.0"
+    "urllib3>=2.0.0",
+    "ffmpeg-python>=0.2.0"
 ]
 
 [tool.setuptools]
