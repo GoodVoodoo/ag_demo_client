@@ -1,22 +1,21 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
-name = "demo-clients"
+name = "audiogram-demo-clients"
 version = "0.1.0"
-description = "MTS AI Demo Clients"
-requires-python = ">=3.8"
+description = "Demonstration clients for Audiogram gRPC API"
+requires-python = ">=3.11"
+
 dependencies = [
-    "grpcio>=1.59.3",
-    "protobuf>=4.25.3",
-    "python-keycloak>=3.7.0",
-    "click>=8.1.7",
-    "tabulate>=0.9.0",
-    "dynaconf[ini]>=3.2.4",
-    "python-dotenv>=1.0.0",
-    "urllib3>=2.0.0",
-    "ffmpeg-python>=0.2.0"
+    "grpcio==1.59.3",
+    "protobuf==4.25.3",
+    "python-keycloak==3.7.0",
+    "click==8.1.7",
+    "tabulate==0.9.0",
+    "dynaconf[ini]==3.2.4",
+    "python-dotenv==1.0.0"
 ]
 
 [tool.setuptools]
