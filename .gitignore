@@ -22,7 +22,8 @@ wheels/
 
 # Virtual Environment
 venv/
-ENV/
+env/
+.env
 
 # IDE
 .idea/
@@ -39,4 +40,12 @@ config copy.ini
 
 # Config files with sensitive data
 # Uncomment if you don't want to track config.ini
-config.ini 
+config.ini
+
+# Output files
+*.wav
+TTSOutput/
+Replay/
+
+# Misc
+.DS_Store 
