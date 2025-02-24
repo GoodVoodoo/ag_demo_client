@@ -46,6 +46,15 @@ def get_models_info(settings: SettingsProtocol) -> None:
         click.echo("Response metadata:")
         print_metadata(call.initial_metadata())
         click.echo()
+        
+        # Print header information if available
+        if hasattr(response, 'header') and response.header:
+            click.echo("Response header:")
+            click.echo(f"  Request ID: {response.header.request_id}")
+            click.echo(f"  Status: {response.header.status}")
+            if response.header.error_message:
+                click.echo(f"  Error message: {response.header.error_message}")
+            click.echo()
 
         model_table = [
             {

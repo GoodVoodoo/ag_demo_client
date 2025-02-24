@@ -268,3 +268,14 @@ def create_config(file_path: str) -> None:
     path_obj.write_bytes(settings_bytes)
 
     click.echo(f"Generated config in {file_path}")
+
+
+# Update default settings
+
+DEFAULT_SETTINGS = {
+    "api_address": "grpc.audiogram-demo.mts.ai:443",
+    "rest_api_address": "https://rest.audiogram-demo.mts.ai",
+    "sso_url": "https://sso.dev.mts.ai",
+    "realm": "audiogram-demo",
+    # ... other settings ...
+}

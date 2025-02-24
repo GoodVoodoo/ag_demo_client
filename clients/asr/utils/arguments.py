@@ -43,6 +43,14 @@ def common_asr_options(
     - speakers_num: int | None - concrete amount of speakers to label
     - wfst_dictionary_name: str - dictionary name for wFST
     - wfst_dictionary_weight: float - weight of wFST dictionary
+    - enhanced_vad_beginning_window_ms: int - Enhanced VAD beginning window size in milliseconds
+    - enhanced_vad_beginning_threshold: float - Enhanced VAD beginning threshold
+    - enhanced_vad_ending_window_ms: int - Enhanced VAD ending window size in milliseconds
+    - enhanced_vad_ending_threshold: float - Enhanced VAD ending threshold
+    - target_speech_vad_beginning_window_ms: int - Target speech VAD beginning window size in milliseconds
+    - target_speech_vad_beginning_threshold: float - Target speech VAD beginning threshold
+    - target_speech_vad_ending_window_ms: int - Target speech VAD ending window size in milliseconds
+    - target_speech_vad_ending_threshold: float - Target speech VAD ending threshold
     """
     options: list = [
         click.option(
@@ -119,6 +127,54 @@ def common_asr_options(
         *_antispoofing_options(),
         *_speaker_labeling_options(),
         *_wfst_dictionary_options(),
+        click.option(
+            "--enhanced-vad-beginning-window-ms",
+            type=int,
+            default=200,
+            help="Enhanced VAD beginning window size in milliseconds",
+        ),
+        click.option(
+            "--enhanced-vad-beginning-threshold",
+            type=float,
+            default=0.5,
+            help="Enhanced VAD beginning threshold",
+        ),
+        click.option(
+            "--enhanced-vad-ending-window-ms",
+            type=int,
+            default=200,
+            help="Enhanced VAD ending window size in milliseconds",
+        ),
+        click.option(
+            "--enhanced-vad-ending-threshold",
+            type=float,
+            default=0.5,
+            help="Enhanced VAD ending threshold",
+        ),
+        click.option(
+            "--target-speech-vad-beginning-window-ms",
+            type=int,
+            default=200,
+            help="Target speech VAD beginning window size in milliseconds",
+        ),
+        click.option(
+            "--target-speech-vad-beginning-threshold",
+            type=float,
+            default=0.5,
+            help="Target speech VAD beginning threshold",
+        ),
+        click.option(
+            "--target-speech-vad-ending-window-ms",
+            type=int,
+            default=200,
+            help="Target speech VAD ending window size in milliseconds",
+        ),
+        click.option(
+            "--target-speech-vad-ending-threshold",
+            type=float,
+            default=0.5,
+            help="Target speech VAD ending threshold",
+        ),
     ]
 
     return options_wrapper(options)

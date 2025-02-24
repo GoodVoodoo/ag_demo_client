@@ -19,6 +19,14 @@ def make_va_config(
     vad_min_speech_ms: int,
     dep_smoothed_window_threshold: float,
     dep_smoothed_window_ms: int,
+    enhanced_vad_beginning_window_ms: int = 200,
+    enhanced_vad_beginning_threshold: float = 0.5,
+    enhanced_vad_ending_window_ms: int = 200,
+    enhanced_vad_ending_threshold: float = 0.5,
+    target_speech_vad_beginning_window_ms: int = 200,
+    target_speech_vad_beginning_threshold: float = 0.5,
+    target_speech_vad_ending_window_ms: int = 200,
+    target_speech_vad_ending_threshold: float = 0.5,
 ) -> stt_pb2.VoiceActivityConfig:
     vad_usage = stt_pb2.VoiceActivityConfig.VoiceActivityDetectionAlgorithmUsage
     match vad_algo:
@@ -43,6 +51,28 @@ def make_va_config(
                 usage=vad_usage.USE_DEP,
                 dep_options=dep_options,
             )
+        case VADAlgo.enhanced_vad:
+            enhanced_vad_options = stt_pb2.EnhancedVADOptions(
+                beginning_window_ms=enhanced_vad_beginning_window_ms,
+                beginning_threshold=enhanced_vad_beginning_threshold,
+                ending_window_ms=enhanced_vad_ending_window_ms,
+                ending_threshold=enhanced_vad_ending_threshold,
+            )
+            return stt_pb2.VoiceActivityConfig(
+                usage=vad_usage.USE_ENHANCED_VAD,
+                enhanced_vad_options=enhanced_vad_options,
+            )
+        case VADAlgo.target_speech_vad:
+            target_speech_vad_options = stt_pb2.TargetSpeechVADOptions(
+                beginning_window_ms=target_speech_vad_beginning_window_ms,
+                beginning_threshold=target_speech_vad_beginning_threshold,
+                ending_window_ms=target_speech_vad_ending_window_ms,
+                ending_threshold=target_speech_vad_ending_threshold,
+            )
+            return stt_pb2.VoiceActivityConfig(
+                usage=vad_usage.USE_TARGET_SPEECH_VAD,
+                target_speech_vad_options=target_speech_vad_options,
+            )
 
     return stt_pb2.VoiceActivityConfig(
         usage=vad_usage.DO_NOT_PERFORM_VOICE_ACTIVITY,
@@ -52,20 +82,26 @@ def make_va_config(
 def make_antispoofing_config(
     enable: bool,
     attack_type: ASAttackType | None,
-    false_acceptance_rate: float | None,
-    false_rejection_rate: float | None,
+    far: int | None,
+    frr: int | None,
     max_duration_for_analysis_ms: int | None,
 ) -> stt_pb2.AntiSpoofingConfig:
-    kwargs = {
-        "enable": enable,
-        "FAR": false_acceptance_rate,
-        "FRR": false_rejection_rate,
-        "max_duration_for_analysis_ms": max_duration_for_analysis_ms,
-    }
-    if attack_type:
-        kwargs["type"] = attack_type.pb2_value
+    if not enable:
+        return stt_pb2.AntiSpoofingConfig(enable=False)
 
-    return stt_pb2.AntiSpoofingConfig(**kwargs)  # type: ignore
+    config = stt_pb2.AntiSpoofingConfig(enable=True)
+    
+    # Note: AttackType field is removed in v3, it's now reserved
+    
+    if far is not None:
+        config.FAR = far
+    elif frr is not None:
+        config.FRR = frr
+
+    if max_duration_for_analysis_ms is not None:
+        config.max_duration_for_analysis_ms = max_duration_for_analysis_ms
+
+    return config
 
 
 def make_speaker_labeling_config(

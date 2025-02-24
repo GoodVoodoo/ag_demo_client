@@ -1,4 +1,4 @@
-import enum
+from enum import Enum, auto
 
 from clients.common_utils.option_types import Pb2Enum, StrEnum
 from clients.genproto import stt_pb2
@@ -7,32 +7,44 @@ _VAEventsMode = stt_pb2.RecognitionConfig.VoiceActivityMarkEventsMode
 _VADMode = stt_pb2.VADOptions.VoiceActivityDetectionMode
 
 
-@enum.unique
-class VAResponseMode(Pb2Enum):
-    pb2_value: _VAEventsMode.ValueType
-    disable = ("disable", _VAEventsMode.VA_DISABLE)
-    enable = ("enable", _VAEventsMode.VA_ENABLE)
-    enable_async = ("enable-async", _VAEventsMode.VA_ENABLE_ASYNC)
+class VAResponseMode(Enum):
+    disable = auto()
+    enable = auto()
+    enable_async = auto()
+
+    @property
+    def pb2_value(self) -> stt_pb2.RecognitionConfig.VoiceActivityMarkEventsMode:
+        return {
+            VAResponseMode.disable: stt_pb2.RecognitionConfig.VoiceActivityMarkEventsMode.VA_DISABLE,
+            VAResponseMode.enable: stt_pb2.RecognitionConfig.VoiceActivityMarkEventsMode.VA_ENABLE,
+            VAResponseMode.enable_async: stt_pb2.RecognitionConfig.VoiceActivityMarkEventsMode.VA_ENABLE_ASYNC,
+        }[self]
 
 
-@enum.unique
-class VADAlgo(StrEnum):
-    vad = "vad"
-    dep = "dep"
-    disabled = "disable"
+class VADAlgo(Enum):
+    none = auto()
+    vad = auto()
+    dep = auto()
+    enhanced_vad = auto()
+    target_speech_vad = auto()
 
 
-@enum.unique
-class VADMode(Pb2Enum):
-    pb2_value: _VADMode.ValueType
-    default = ("default", _VADMode.VAD_MODE_DEFAULT)
-    only_speech = ("only-speech", _VADMode.ONLY_SPEECH)
-    split_by_pauses = ("split-by-pauses", _VADMode.SPLIT_BY_PAUSES)
+class VADMode(Enum):
+    default = auto()
+    split_by_pauses = auto()
+    only_speech = auto()
+
+    @property
+    def pb2_value(self) -> stt_pb2.VADOptions.VoiceActivityDetectionMode:
+        return {
+            VADMode.default: stt_pb2.VADOptions.VoiceActivityDetectionMode.VAD_MODE_DEFAULT,
+            VADMode.split_by_pauses: stt_pb2.VADOptions.VoiceActivityDetectionMode.SPLIT_BY_PAUSES,
+            VADMode.only_speech: stt_pb2.VADOptions.VoiceActivityDetectionMode.ONLY_SPEECH,
+        }[self]
 
 
-@enum.unique
-class ASAttackType(Pb2Enum):
-    pb2_value: stt_pb2.AttackType.ValueType
-    logical = ("logical", stt_pb2.AttackType.LOGICAL)
-    physical = ("physical", stt_pb2.AttackType.PHYSICAL)
-    all_types = ("all-types", stt_pb2.AttackType.ALL_TYPES)
+# Note: ASAttackType is no longer used in v3 but we'll keep it for backward compatibility
+class ASAttackType(Enum):
+    logical = auto()
+    physical = auto()
+    all_types = auto()
