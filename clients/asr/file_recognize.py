@@ -72,6 +72,14 @@ def file_recognize(
     wfst_dictionary_name: str,
     wfst_dictionary_weight: float,
     split_by_channel: bool,
+    enhanced_vad_beginning_window_ms: int,
+    enhanced_vad_beginning_threshold: float,
+    enhanced_vad_ending_window_ms: int,
+    enhanced_vad_ending_threshold: float,
+    target_speech_vad_beginning_window_ms: int,
+    target_speech_vad_beginning_threshold: float,
+    target_speech_vad_ending_window_ms: int,
+    target_speech_vad_ending_threshold: float,
 ) -> None:
     auth_metadata = get_auth_metadata(
         settings.sso_url,
@@ -82,7 +90,11 @@ def file_recognize(
         settings.iam_workspace,
         settings.verify_sso,
     )
-
+    
+    # Add required headers for v3
+    auth_metadata.append(("x-ai-account", "demo"))
+    auth_metadata.append(("x-ai-workspace", "default"))
+    
     audio = AudioFile(audio_file)
 
     click.echo(
@@ -108,6 +120,14 @@ def file_recognize(
         vad_min_speech_ms,
         dep_smoothed_window_threshold,
         dep_smoothed_window_ms,
+        enhanced_vad_beginning_window_ms,
+        enhanced_vad_beginning_threshold,
+        enhanced_vad_ending_window_ms,
+        enhanced_vad_ending_threshold,
+        target_speech_vad_beginning_window_ms,
+        target_speech_vad_beginning_threshold,
+        target_speech_vad_ending_window_ms,
+        target_speech_vad_ending_threshold,
     )
     as_config = make_antispoofing_config(
         enable_antispoofing,

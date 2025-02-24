@@ -74,35 +74,39 @@ def print_hypothesis(
 def print_spoofing_results(results: Iterable[stt_pb2.SpoofingResult]) -> None:
     click.echo("\tSpoofing results:")
     for result in results:
-        result_type = stt_pb2.AttackType.Name(result.type)
         result_result = stt_pb2.SpoofingResult.AttackResult.Name(result.result)
         click.echo(
             f"\t\tResult: {result_result}\n"
-            f"\t\tType: {result_type}\n"
             f"\t\tConfidence: {result.confidence:.4g}\n"
             f"\t\tInterval: {result.start_time_ms / 1000}s - {result.end_time_ms / 1000}s"
         )
 
 
-def print_recognize_response(
-    result: stt_pb2.RecognizeResponse,
-    consider_final: bool = False,
-) -> None:
-    if result.channel:
-        click.echo(f"\tChannel: {result.channel}")
+def print_recognize_response(response, is_file_response=False):
+    # Print header information if available
+    if hasattr(response, 'header') and response.header:
+        click.echo("Response header:")
+        click.echo(f"  Request ID: {response.header.request_id}")
+        click.echo(f"  Status: {response.header.status}")
+        if response.header.error_message:
+            click.echo(f"  Error message: {response.header.error_message}")
+        click.echo("")
+    
+    if response.channel:
+        click.echo(f"\tChannel: {response.channel}")
 
-    if result.HasField("speaker_info") and result.speaker_info.speaker_id:
-        click.echo(f"\tSpeaker ID: {result.speaker_info.speaker_id}")
+    if response.HasField("speaker_info") and response.speaker_info.speaker_id:
+        click.echo(f"\tSpeaker ID: {response.speaker_info.speaker_id}")
 
-    if result.HasField("hypothesis"):
-        is_final = consider_final or result.is_final
-        print_hypothesis(result.hypothesis, is_final)
+    if response.HasField("hypothesis"):
+        is_final = response.is_final
+        print_hypothesis(response.hypothesis, is_final)
 
-    if result.va_marks:
-        print_va_marks(result.va_marks)
+    if response.va_marks:
+        print_va_marks(response.va_marks)
 
-    if result.HasField("genderage"):
-        print_genderage_result(result.genderage)
+    if response.HasField("genderage"):
+        print_genderage_result(response.genderage)
 
-    if result.spoofing_result:
-        print_spoofing_results(result.spoofing_result)
+    if response.spoofing_result:
+        print_spoofing_results(response.spoofing_result)
