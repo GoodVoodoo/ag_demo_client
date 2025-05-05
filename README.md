@@ -156,3 +156,30 @@ Date formatting:
 ```bash
 python -m clients.main synthesize file --text "<speak>Следующее списание произойдёт <say-as interpret-as='date' format='genitive' detail='d.m'>21.12</say-as>.</speak>" --config config.ini --save-to output.wav
 ```
+
+### Available Voices
+
+The following voices are available for TTS synthesis:
+
+| Voice Name  | Sample Rate | Type         |
+|-------------|-------------|--------------|
+| borisova    | 8000        | high_quality |
+| borisova    | 22050       | high_quality |
+| eldarov     | 8000        | high_quality |
+| eldarov     | 22050       | high_quality |
+| gandzhaev   | 8000        | high_quality |
+| gandzhaev   | 22050       | high_quality |
+| gavrilov    | 8000        | high_quality |
+| gavrilov    | 22050       | high_quality |
+| kishchik    | 8000        | high_quality |
+| kishchik    | 22050       | high_quality |
+| klukvin     | 8000        | high_quality |
+| klukvin     | 22050       | high_quality |
+| koryakina   | 8000        | high_quality |
+| koryakina   | 22050       | high_quality |
+| voice 1     | 22050       | eng voice    |
+| voice 2     | 22050       | eng voice    |
+| voice 3     | 22050       | eng voice    |
+| voice 4     | 22050       | eng voice    |
+| vostretsov  | 8000        | high_quality |
+| vostretsov  | 22050       | high_quality |
