@@ -1,9 +1,32 @@
+import os
 from collections.abc import Iterable
-
+from dataclasses import dataclass
+from typing import List
+import sys
 import click
 from google.protobuf.duration_pb2 import Duration
 
 from clients.genproto import stt_pb2
+
+
+@dataclass
+class TranscriptionEntry:
+    start_time_ms: int
+    end_time_ms: int
+    transcript: str
+    channel: int | None
+    is_final: bool
+
+    def __str__(self) -> str:
+        channel_info = f"Channel {self.channel}: " if self.channel is not None else ""
+        return f"{channel_info}{self.transcript}"
+
+
+# Global list to store all transcriptions
+all_transcriptions: List[TranscriptionEntry] = []
+
+# Global counter for result numbering
+result_counter = 0
 
 
 def _duration_to_str(d: Duration) -> str:
@@ -39,11 +62,14 @@ def print_genderage_result(genderage: stt_pb2.SpeakerGenderAgePrediction) -> Non
 def print_hypothesis(
     hypothesis: stt_pb2.SpeechRecognitionHypothesis,
     is_final: bool = True,
+    text_file_output: bool = False,
+    text_file_path: str | None = None,
+    channel: int | None = None,
 ) -> None:
     transcript = None
-    if hypothesis.normalized_transcript:
+    if hypothesis.normalized_transcript:  # Just check if the field has a value
         transcript = hypothesis.normalized_transcript
-    elif hypothesis.transcript:
+    elif hypothesis.transcript:  # Just check if the field has a value
         transcript = hypothesis.transcript
 
     if transcript:
@@ -60,6 +86,18 @@ def print_hypothesis(
             msg += f", confidence: {hypothesis.confidence:.4g}"
 
         click.echo(msg)
+
+        # Add to global transcriptions list if it's a final result
+        if text_file_output:  # Changed condition to collect all transcriptions
+            click.echo(f"\tAdding transcription to list: Channel {channel}, Text: {transcript}")
+            entry = TranscriptionEntry(
+                start_time_ms=hypothesis.start_time_ms,
+                end_time_ms=hypothesis.end_time_ms,
+                transcript=transcript,
+                channel=channel,
+                is_final=is_final
+            )
+            all_transcriptions.append(entry)
 
     words = hypothesis.normalized_words or hypothesis.words
 
@@ -82,7 +120,35 @@ def print_spoofing_results(results: Iterable[stt_pb2.SpoofingResult]) -> None:
         )
 
 
-def print_recognize_response(response, is_file_response=False):
+def print_recognize_response(response, is_file_response=False, text_file_output=False, audio_file=None):
+    global result_counter
+    
+    # If text file output is enabled, prepare the output file path
+    text_file_path = None
+    current_channel = None
+    if response.channel:
+        current_channel = response.channel
+        
+    if text_file_output and audio_file:
+        try:
+            # Get the base name of the audio file without extension
+            base_name = os.path.splitext(audio_file)[0]
+            text_file_path = f"{base_name}.txt"
+            
+            # Create directory if it doesn't exist
+            dir_path = os.path.dirname(text_file_path)
+            if dir_path:
+                os.makedirs(dir_path, exist_ok=True)
+            
+            # Clear the file and reset counter only on the first response
+            if hasattr(response, 'header') and response.header:
+                if os.path.exists(text_file_path):
+                    os.remove(text_file_path)
+                result_counter = 0  # Reset counter at start
+        except Exception as e:
+            click.echo(f"\nError handling text file: {str(e)}")
+            text_file_path = None
+
     # Print header information if available
     if hasattr(response, 'header') and response.header:
         click.echo("Response header:")
@@ -92,15 +158,43 @@ def print_recognize_response(response, is_file_response=False):
             click.echo(f"  Error message: {response.header.error_message}")
         click.echo("")
     
-    if response.channel:
-        click.echo(f"\tChannel: {response.channel}")
+    if current_channel:
+        click.echo(f"\tChannel: {current_channel}")
 
     if response.HasField("speaker_info") and response.speaker_info.speaker_id:
         click.echo(f"\tSpeaker ID: {response.speaker_info.speaker_id}")
 
     if response.HasField("hypothesis"):
         is_final = response.is_final
-        print_hypothesis(response.hypothesis, is_final)
+        transcript = None
+        if response.hypothesis.normalized_transcript:
+            transcript = response.hypothesis.normalized_transcript
+        elif response.hypothesis.transcript:
+            transcript = response.hypothesis.transcript
+
+        if transcript and text_file_output and text_file_path:
+            try:
+                result_counter += 1  # Increment counter for each result
+                with open(text_file_path, 'a', encoding='utf-8') as f:
+                    time_info = f"({response.hypothesis.start_time_ms/1000:05.2f}s-{response.hypothesis.end_time_ms/1000:05.2f}s)"
+                    f.write(f"Result {result_counter}:\n")
+                    f.write(f"        Channel: {current_channel}\n")
+                    f.write(f'        Hypothesis {time_info}: "{transcript}" is_final: {is_final}\n\n')
+            except Exception as e:
+                click.echo(f"\nError writing to file: {str(e)}")
+
+        msg = f'\tHypothesis{time_info}: "{transcript}" is_final: {is_final}'
+        if is_final:
+            msg += f", confidence: {response.hypothesis.confidence:.4g}"
+        click.echo(msg)
+
+        words = response.hypothesis.normalized_words or response.hypothesis.words
+        for word in words:
+            click.echo(
+                f"\t\t{word.start_time_ms / 1000:05.2f}s - "
+                f'{word.end_time_ms / 1000:05.2f}s: "{word.word}" '
+                f"confidence: {word.confidence:.4g}"
+            )
 
     if response.va_marks:
         print_va_marks(response.va_marks)
@@ -110,3 +204,27 @@ def print_recognize_response(response, is_file_response=False):
 
     if response.spoofing_result:
         print_spoofing_results(response.spoofing_result)
+
+    # Write sorted transcriptions to file only on the last response of the sequence
+    if text_file_output and text_file_path and is_file_response and not response.HasField("hypothesis"):
+        try:
+            click.echo(f"\nPreparing to write {len(all_transcriptions)} transcriptions to file")
+            # Sort all transcriptions by start time, using end time as secondary sort for 0-start entries
+            sorted_transcriptions = sorted(all_transcriptions, key=lambda x: (x.start_time_ms if x.start_time_ms > 0 else x.end_time_ms))
+            
+            # Write to file
+            with open(text_file_path, 'w', encoding='utf-8') as f:
+                # Write results in the expected format
+                for idx, entry in enumerate(sorted_transcriptions, 1):
+                    if entry.transcript.strip():  # Only write non-empty transcripts
+                        click.echo(f"\nWriting Result {idx} to file")
+                        f.write(f"Result {idx}:\n")
+                        f.write(f"        Channel: {entry.channel}\n")
+                        time_info = f"({entry.start_time_ms/1000:05.2f}s-{entry.end_time_ms/1000:05.2f}s)"
+                        f.write(f'        Hypothesis {time_info}: "{entry.transcript}" is_final: {entry.is_final}\n\n')
+                
+            click.echo(f"\nFinished writing to {text_file_path}")
+            # Clear the list after writing the final results
+            all_transcriptions = []
+        except Exception as e:
+            click.echo(f"\nError writing sorted transcriptions to file: {str(e)}")
