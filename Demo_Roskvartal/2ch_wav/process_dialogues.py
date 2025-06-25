@@ -12,6 +12,7 @@ def extract_dialogue(file_path):
             start = line.find('"') + 1
             end = line.rfind('"')
             if start > 0 and end > start:
+                # Format with dash and quotes
                 dialogue_lines.append(f'- "{line[start:end]}"')
     
     return dialogue_lines
