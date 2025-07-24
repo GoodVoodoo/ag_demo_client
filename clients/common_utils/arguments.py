@@ -175,8 +175,17 @@ def common_options_in_settings(func: Callable[P, T]) -> Callable[P, T]:
         config_path_str = cast(str | None, options.pop("config_path"))
         config_path = Path(config_path_str or "")  # Prevent failing on None value
 
+        # If no config path specified, look for config.ini in current directory
+        if not config_path_str:
+            default_config = Path("config.ini")
+            if default_config.is_file():
+                config_path_str = str(default_config)
+                config_path = default_config
+                click.echo(f'Loading .ini configuration from "{config_path.name}"\n')
+
         if config_path_str and config_path.is_file():
-            click.echo(f'Loading .ini configuration from "{config_path.name}"\n')
+            if not config_path_str.startswith("config.ini"):
+                click.echo(f'Loading .ini configuration from "{config_path.name}"\n')
             settings = Settings([config_path_str])
         else:
             settings = Settings([])

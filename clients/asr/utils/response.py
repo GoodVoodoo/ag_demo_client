@@ -172,11 +172,13 @@ def print_recognize_response(response, is_file_response=False, text_file_output=
         elif response.hypothesis.transcript:
             transcript = response.hypothesis.transcript
 
+        # Define time_info for display
+        time_info = f"({response.hypothesis.start_time_ms/1000:05.2f}s-{response.hypothesis.end_time_ms/1000:05.2f}s)"
+        
         if transcript and text_file_output and text_file_path:
             try:
                 result_counter += 1  # Increment counter for each result
                 with open(text_file_path, 'a', encoding='utf-8') as f:
-                    time_info = f"({response.hypothesis.start_time_ms/1000:05.2f}s-{response.hypothesis.end_time_ms/1000:05.2f}s)"
                     f.write(f"Result {result_counter}:\n")
                     f.write(f"        Channel: {current_channel}\n")
                     f.write(f'        Hypothesis {time_info}: "{transcript}" is_final: {is_final}\n\n')
