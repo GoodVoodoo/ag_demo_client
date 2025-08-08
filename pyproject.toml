@@ -7,6 +7,7 @@ name = "audiogram-demo-clients"
 version = "0.1.0"
 description = "Demonstration clients for Audiogram gRPC API"
 requires-python = ">=3.11"
+readme = "README.md"
 
 dependencies = [
     "grpcio==1.59.3",
@@ -15,8 +16,12 @@ dependencies = [
     "click==8.1.7",
     "tabulate==0.9.0",
     "dynaconf[ini]==3.2.4",
-    "python-dotenv==1.0.0"
+    "python-dotenv==1.0.0",
+    "ffmpeg-python>=0.2.0"
 ]
 
-[tool.setuptools]
-packages = ["clients"] 
+[project.scripts]
+audiogram = "clients.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["clients"]
