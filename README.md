@@ -170,47 +170,19 @@ If you created a virtual environment in `venv/`, you can run commands via the ve
 
 #### Quick Model Discovery
 ```bash
-# Get all available models with statistics
-python -m clients.main models info --config config.ini --show-stats
-
 # Get only ASR models
-python -m clients.main models recognize --config config.ini
+audiogram models recognize --config config.ini
 
-# Get only TTS models  
-python -m clients.main models synthesize --config config.ini
+# Get only TTS models
+audiogram models synthesize --config config.ini
 ```
 
-#### Advanced Model Queries
-```bash
-# Get models in JSON format
-python -m clients.main models info --config config.ini --output-format json
-
-# Filter by sample rate
-python -m clients.main models info --config config.ini --filter-sample-rate 22050
-
-# Filter TTS models by quality level
-python -m clients.main models info --config config.ini --service tts --filter-quality High
-
-# Group models by service type
-python -m clients.main models info --config config.ini --group-by service
-
-# Save detailed model information to file
-python -m clients.main models info --config config.ini --output-format json --save-to models.json
 ```
 
-#### Filtering and Grouping Options
+#### Grouping Options
 ```bash
-# Filter by language
-python -m clients.main models info --config config.ini --filter-language ru
-
 # Group TTS models by voice name
-python -m clients.main models synthesize --config config.ini --group-by-voice
-
-# Sort by sample rate
-python -m clients.main models info --config config.ini --sort-by sample_rate
-
-# Verbose output with detailed information
-python -m clients.main models info --config config.ini --verbose
+audiogram models synthesize --config config.ini --group-by-voice
 ```
 
 ### Automatic Speech Recognition (ASR)
@@ -257,13 +229,13 @@ python audio_converter.py my_speech.mp3 --output-dir converted
 #### File-based Recognition
 ```bash
 # Basic transcription
-python -m clients.main recognize file --audio-file audio.wav --config config.ini
+audiogram recognize file --audio-file audio.wav --config config.ini
 
 # With enhanced features from MP3
-python -m clients.main recognize file --audio-file your_audio.mp3 --config config.ini --enable-antispoofing --enable-punctuator --enable-genderage
+audiogram recognize file --audio-file your_audio.mp3 --config config.ini --enable-antispoofing --enable-punctuator --enable-genderage
 
 # Using best model with converted audio
-python -m clients.main recognize file --audio-file output/output.wav --config config.ini --model e2e-v3
+audiogram recognize file --audio-file output/output.wav --config config.ini --model e2e-v3
 ```
 
 #### Complete MP3 to ASR Workflow
@@ -275,16 +247,16 @@ pwd
 python audio_converter.py speech_recording.mp3 --output-dir converted
 
 # 3. Run ASR with best available model
-python -m clients.main recognize file --audio-file converted/output.wav --config config.ini --model e2e-v3 --enable-antispoofing --enable-punctuator
+audiogram recognize file --audio-file converted/output.wav --config config.ini --model e2e-v3 --enable-antispoofing --enable-punctuator
 
 # 4. Check available ASR models
-python -m clients.main models recognize --config config.ini
+audiogram models recognize --config config.ini
 ```
 
 #### Streaming Recognition
 ```bash
 # Real-time transcription
-python -m clients.main recognize stream --audio-file audio.wav --config config.ini
+audiogram recognize stream --audio-file audio.wav --config config.ini
 ```
 
 #### Dumping request JSON (for debugging)
@@ -292,14 +264,14 @@ Print the JSON representation of the ASR request (RecognitionConfig) and audio b
 
 ```bash
 # File mode (macOS/Linux)
-./venv/bin/python -m clients.main recognize file --audio-file ./SPK-13769/gen/GLEB_NEWS_000955.wav --config ./config.ini --dump-json-request
+audiogram recognize file --audio-file ./SPK-13769/gen/GLEB_NEWS_000955.wav --config ./config.ini --dump-json-request
 
 # Stream mode (macOS/Linux)
-./venv/bin/python -m clients.main recognize stream --audio-file ./SPK-13769/gen/GLEB_NEWS_000955.wav --config ./config.ini --dump-json-request
+audiogram recognize stream --audio-file ./SPK-13769/gen/GLEB_NEWS_000955.wav --config ./config.ini --dump-json-request
 
 # PowerShell examples
-python -m clients.main recognize file --audio-file .\SPK-13769\gen\GLEB_NEWS_000955.wav --config .\config.ini --dump-json-request
-python -m clients.main recognize stream --audio-file .\SPK-13769\gen\GLEB_NEWS_000955.wav --config .\config.ini --dump-json-request
+audiogram recognize file --audio-file .\SPK-13769\gen\GLEB_NEWS_000955.wav --config .\config.ini --dump-json-request
+audiogram recognize stream --audio-file .\SPK-13769\gen\GLEB_NEWS_000955.wav --config .\config.ini --dump-json-request
 ```
 
 ### Text-to-Speech (TTS)
@@ -307,13 +279,13 @@ python -m clients.main recognize stream --audio-file .\SPK-13769\gen\GLEB_NEWS_0
 #### File-based Synthesis
 ```bash
 # Basic synthesis
-python -m clients.main synthesize file \
+audiogram synthesize file \
     --text "Привет, как дела?" \
     --config config.ini \
     --save-to output.wav
 
 # Advanced synthesis with voice selection
-python -m clients.main synthesize file \
+audiogram synthesize file \
     --text "Ваш заказ готов к получению" \
     --config config.ini \
     --voice-name borisova \
@@ -326,13 +298,13 @@ python -m clients.main synthesize file \
 #### SSML-Enhanced Synthesis
 ```bash
 # Using SSML for advanced control
-python -m clients.main synthesize file \
+audiogram synthesize file \
     --text "<speak>Почему <emphasis strength='strong'>они</emphasis> не согласны?</speak>" \
     --config config.ini \
     --save-to emphasized.wav
 
 # Number and date formatting
-python -m clients.main synthesize file \
+audiogram synthesize file \
     --text "<speak>Сегодня <say-as interpret-as='date' format='genitive'>21.12</say-as></speak>" \
     --config config.ini \
     --save-to date_announcement.wav
@@ -341,7 +313,7 @@ python -m clients.main synthesize file \
 #### Streaming Synthesis
 ```bash
 # Real-time synthesis
-python -m clients.main synthesize stream \
+audiogram synthesize stream \
     --text "Длинный текст для потокового синтеза" \
     --config config.ini \
     --voice-name gandzhaev
@@ -370,86 +342,19 @@ python -m clients.main synthesize stream \
 
 ## Output Formats
 
-### JSON Output Example
-```json
-{
-  "timestamp": "2025-01-06T12:40:36.123456",
-  "service": "all",
-  "total_count": 22,
-  "request_ids": {
-    "asr": "MR-25db467a-5491-40b2-a58e-d40c7d4950cc",
-    "tts": "MS-4fe922ad-f22d-437c-8747-b9bbb8cd6e00"
-  },
-  "models": [
-    {
-      "name": "e2e-v3",
-      "type": "ASR",
-      "language_code": "ru",
-      "sample_rate_hertz": 16000,
-      "dictionaries": ["kion", "v0"],
-      "quality_level": null
-    }
-  ]
-}
-```
-
-### CSV Export
-```bash
-# Export model information to CSV
-python -m clients.main models info --config config.ini --output-format csv --save-to models.csv
-```
-
 ## Testing and Development
-
-### Interactive Testing
-```bash
-# Run the interactive test script
-python test_models_service.py
-```
-
-### Generate Usage Documentation
-```bash
-# Create comprehensive usage guide
-python test_models_service.py
-# Select option 2 to generate GetModelsInfo_Usage_Guide.md
-```
 
 ### Command-line Testing Examples
 ```bash
 # Test basic ASR functionality
-python -m clients.main models recognize --config config.ini --verbose
+audiogram models recognize --config config.ini --verbose
 
 # Test TTS with grouping
-python -m clients.main models synthesize --config config.ini --group-by-voice
-
-# Test comprehensive service with statistics
-python -m clients.main models info --config config.ini --show-stats --verbose
+audiogram models synthesize --config config.ini --group-by-voice
 ```
 
 ## Integration Examples
-
-### Python Script Integration
-```python
-from clients.models_service import ModelsService
-from clients.common_utils.config import load_settings
-
-# Load configuration
-settings = load_settings("config.ini")
-
-# Create service instance
-service = ModelsService(settings)
-
-# Get all models
-all_models, request_ids = service.get_all_models()
-print(f"Found {len(all_models)} total models")
-
-# Filter models by criteria
-asr_models = [m for m in all_models if m.type == "ASR"]
-high_quality_tts = [m for m in all_models if m.type == "TTS" and m.quality_level == "High"]
-
-print(f"ASR models: {len(asr_models)}")
-print(f"High-quality TTS models: {len(high_quality_tts)}")
-```
+Use the `audiogram` CLI in your automation scripts or invoke the `clients` Python modules directly for advanced use.
 
 ## Error Handling and Troubleshooting
 
@@ -527,9 +432,7 @@ The TTS system supports comprehensive SSML (Speech Synthesis Markup Language) fe
 
 ## Support and Documentation
 
-- **API Documentation**: See `AG_manual_ru.md` for complete API reference
-- **Usage Examples**: Run `python test_models_service.py` for interactive examples
-- **Generated Docs**: Use option 2 in test script to create detailed usage guide
+- Refer to this README and inline `--help` for each CLI command: `audiogram --help`
 
 ## Contributing
 
