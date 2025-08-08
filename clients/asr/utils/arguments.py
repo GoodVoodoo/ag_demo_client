@@ -62,7 +62,7 @@ def common_asr_options(
         ),
         click.option(
             "--model",
-            default="e2e-v1",
+            default="e2e-v3",
             help="ASR model name (list can be requested with get_models_info)",
             show_default=True,
         ),

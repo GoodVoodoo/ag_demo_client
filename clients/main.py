@@ -6,7 +6,7 @@ from urllib3.exceptions import InsecureRequestWarning
 
 from clients import asr, tts
 from clients.common_utils.config import create_config
-from clients.models_service import models_info as comprehensive_models_info
+# from clients.models_service import models_info as comprehensive_models_info
 
 # NB (k.zhovnovatiy): Disable warning from unsafe Keycloak connection (--verify-sso false)
 urllib3.disable_warnings(InsecureRequestWarning)
@@ -52,7 +52,7 @@ models_group.add_command(asr.get_models_info, "recognize")
 models_group.add_command(tts.get_models_info, "synthesize")
 
 # Comprehensive model info command
-models_group.add_command(comprehensive_models_info, "info")
+# models_group.add_command(comprehensive_models_info, "info")
 
 main.add_command(asr_group)
 main.add_command(tts_group)
