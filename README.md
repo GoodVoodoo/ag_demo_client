@@ -160,6 +160,12 @@ verify_sso = true
 
 ## Usage Guide
 
+### Using the bundled virtual environment
+If you created a virtual environment in `venv/`, you can run commands via the venv Python directly:
+```bash
+./venv/bin/python -m clients.main models recognize --config ./config.ini
+```
+
 ### Model Information Services
 
 #### Quick Model Discovery
@@ -254,18 +260,10 @@ python audio_converter.py my_speech.mp3 --output-dir converted
 python -m clients.main recognize file --audio-file audio.wav --config config.ini
 
 # With enhanced features from MP3
-python -m clients.main recognize file \
-    --audio-file your_audio.mp3 \
-    --config config.ini \
-    --enable-antispoofing \
-    --enable-punctuator \
-    --enable-genderage
+python -m clients.main recognize file --audio-file your_audio.mp3 --config config.ini --enable-antispoofing --enable-punctuator --enable-genderage
 
 # Using best model with converted audio
-python -m clients.main recognize file \
-    --audio-file output/output.wav \
-    --config config.ini \
-    --model-name e2e-v3
+python -m clients.main recognize file --audio-file output/output.wav --config config.ini --model e2e-v3
 ```
 
 #### Complete MP3 to ASR Workflow
@@ -277,12 +275,7 @@ pwd
 python audio_converter.py speech_recording.mp3 --output-dir converted
 
 # 3. Run ASR with best available model
-python -m clients.main recognize file \
-    --audio-file converted/output.wav \
-    --config config.ini \
-    --model-name e2e-v3 \
-    --enable-antispoofing \
-    --enable-punctuator
+python -m clients.main recognize file --audio-file converted/output.wav --config config.ini --model e2e-v3 --enable-antispoofing --enable-punctuator
 
 # 4. Check available ASR models
 python -m clients.main models recognize --config config.ini
@@ -292,6 +285,21 @@ python -m clients.main models recognize --config config.ini
 ```bash
 # Real-time transcription
 python -m clients.main recognize stream --audio-file audio.wav --config config.ini
+```
+
+#### Dumping request JSON (for debugging)
+Print the JSON representation of the ASR request (RecognitionConfig) and audio byte-size. Metadata headers are not printed.
+
+```bash
+# File mode (macOS/Linux)
+./venv/bin/python -m clients.main recognize file --audio-file ./SPK-13769/gen/GLEB_NEWS_000955.wav --config ./config.ini --dump-json-request
+
+# Stream mode (macOS/Linux)
+./venv/bin/python -m clients.main recognize stream --audio-file ./SPK-13769/gen/GLEB_NEWS_000955.wav --config ./config.ini --dump-json-request
+
+# PowerShell examples
+python -m clients.main recognize file --audio-file .\SPK-13769\gen\GLEB_NEWS_000955.wav --config .\config.ini --dump-json-request
+python -m clients.main recognize stream --audio-file .\SPK-13769\gen\GLEB_NEWS_000955.wav --config .\config.ini --dump-json-request
 ```
 
 ### Text-to-Speech (TTS)

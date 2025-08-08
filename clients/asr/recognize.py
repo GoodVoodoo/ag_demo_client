@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 
 import click
+from google.protobuf.json_format import MessageToJson
 import grpc
 
 from clients.common_utils.arguments import common_options_in_settings
@@ -107,6 +108,12 @@ def recognize(
     target_speech_vad_beginning_threshold: float,
     target_speech_vad_ending_window_ms: int,
     target_speech_vad_ending_threshold: float,
+    dump_json_request: bool = click.option(
+        "--dump-json-request",
+        is_flag=True,
+        default=False,
+        help="print JSON representation of the request config and metadata (audio not included)",
+    )(lambda: None),
 ) -> None:
     auth_metadata = get_auth_metadata(
         settings.sso_url,
@@ -192,6 +199,28 @@ def recognize(
         single_utterance=single_utterance,
         interim_results=interim_results,
     )
+    # Optional: print JSON representation for stream request
+    if dump_json_request:
+        try:
+            config_json = MessageToJson(
+                recognition_config,
+                preserving_proto_field_name=True,
+            )
+            click.echo("\n--- JSON Request (RecognitionConfig) ---\n")
+            click.echo(config_json)
+            click.echo("\n--- Stream Options ---\n")
+            click.echo(
+                {
+                    "single_utterance": single_utterance,
+                    "interim_results": interim_results,
+                    "chunk_len_ms": chunk_len_ms,
+                    "realtime": realtime,
+                }
+            )
+            # Metadata intentionally not printed per request
+            click.echo()
+        except Exception as exc:
+            click.echo(f"Failed to dump JSON request: {exc}\n")
     request_iterator = stream_request_iterator(
         stream_recognition_config,
         audio.chunks(chunk_len_ms),

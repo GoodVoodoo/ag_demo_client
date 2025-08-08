@@ -1,4 +1,5 @@
 import click
+from google.protobuf.json_format import MessageToJson
 import grpc
 
 from clients.common_utils.arguments import common_options_in_settings
@@ -44,6 +45,12 @@ from .utils.response import print_recognize_response
     default=False,
     help="recognize audio channels as separate speech tracks",
 )
+@click.option(
+    "--dump-json-request",
+    is_flag=True,
+    default=False,
+    help="print JSON representation of the request config and metadata (audio not included)",
+)
 def file_recognize(
     settings: SettingsProtocol,
     audio_file: str,
@@ -80,6 +87,7 @@ def file_recognize(
     target_speech_vad_beginning_threshold: float,
     target_speech_vad_ending_window_ms: int,
     target_speech_vad_ending_threshold: float,
+    dump_json_request: bool,
 ) -> None:
     auth_metadata = get_auth_metadata(
         settings.sso_url,
@@ -164,6 +172,21 @@ def file_recognize(
         config=recognition_config,
         audio=audio.blob,
     )
+
+    # Optional: print JSON representation of request config and metadata
+    if dump_json_request:
+        try:
+            config_json = MessageToJson(
+                recognition_config,
+                preserving_proto_field_name=True,
+            )
+            click.echo("\n--- JSON Request (RecognitionConfig) ---\n")
+            click.echo(config_json)
+            click.echo("\n--- Audio Payload ---\n")
+            click.echo(f"bytes: {len(audio.blob)} (not printed)")
+            click.echo()
+        except Exception as exc:
+            click.echo(f"Failed to dump JSON request: {exc}\n")
 
     click.echo(f"Connecting to gRPC server - {settings.api_address}\n")
 
