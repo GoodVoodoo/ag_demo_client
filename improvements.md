@@ -20,14 +20,14 @@ Use this checklist to track architectural and codebase improvements. Items marke
 
 #### Documentation
 - [x] Update README to prefer `audiogram` CLI over `python -m clients.main`
-- [ ] Split docs into `docs/quickstart.md`, `docs/cli.md`, `docs/architecture.md`
+- [x] Split docs into `docs/quickstart.md`, `docs/cli.md`, `docs/architecture.md`
 - [ ] Auto-generate CLI reference (e.g., via `sphinx-click` or scripted `--help` dumps)
 
 #### Code organisation & quality
 - [x] Consolidate shared Click options into `clients/common_utils/cli_options.py`
-- [ ] Introduce `ModelService` abstraction and wire a comprehensive `models info` command
+- [x] Introduce `ModelService` abstraction and wire a comprehensive `models info` command
 - [x] Replace `print` with `logging` in `audio_converter.py` and other CLIs, add `--verbose`
-- [ ] Move shared enums/types from service-specific utils into `clients/common_utils/types.py`
+- [x] Move shared enums/types from service-specific utils into `clients/common_utils/types.py`
 - [x] Remove commented-out code and dead exports across the repo
 
 #### Testing & CI
