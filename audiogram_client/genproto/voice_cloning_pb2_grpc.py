@@ -4,7 +4,7 @@ import grpc
 import warnings
 
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
-import tts_pb2 as tts__pb2
+import voice_cloning_pb2 as voice__cloning__pb2
 
 GRPC_GENERATED_VERSION = '1.74.0'
 GRPC_VERSION = grpc.__version__
@@ -19,14 +19,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in tts_pb2_grpc.py depends on'
+        + f' but the generated code in voice_cloning_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class TTSStub(object):
+class VoiceCloningStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -35,102 +35,75 @@ class TTSStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.StreamingSynthesize = channel.unary_stream(
-                '/mts.ai.audiogram.tts.v2.TTS/StreamingSynthesize',
-                request_serializer=tts__pb2.SynthesizeSpeechRequest.SerializeToString,
-                response_deserializer=tts__pb2.StreamingSynthesizeSpeechResponse.FromString,
+        self.CloneVoice = channel.unary_unary(
+                '/mts.ai.audiogram.voice_cloning.v1.VoiceCloning/CloneVoice',
+                request_serializer=voice__cloning__pb2.CloneVoiceRequest.SerializeToString,
+                response_deserializer=voice__cloning__pb2.TaskId.FromString,
                 _registered_method=True)
-        self.Synthesize = channel.unary_unary(
-                '/mts.ai.audiogram.tts.v2.TTS/Synthesize',
-                request_serializer=tts__pb2.SynthesizeSpeechRequest.SerializeToString,
-                response_deserializer=tts__pb2.SynthesizeSpeechResponse.FromString,
+        self.GetTaskInfo = channel.unary_unary(
+                '/mts.ai.audiogram.voice_cloning.v1.VoiceCloning/GetTaskInfo',
+                request_serializer=voice__cloning__pb2.TaskId.SerializeToString,
+                response_deserializer=voice__cloning__pb2.TaskInfo.FromString,
                 _registered_method=True)
-        self.GetModelsInfo = channel.unary_unary(
-                '/mts.ai.audiogram.tts.v2.TTS/GetModelsInfo',
-                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=tts__pb2.ModelsInfo.FromString,
+        self.DeleteVoice = channel.unary_unary(
+                '/mts.ai.audiogram.voice_cloning.v1.VoiceCloning/DeleteVoice',
+                request_serializer=voice__cloning__pb2.DeleteVoiceRequest.SerializeToString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
 
 
-class TTSServicer(object):
+class VoiceCloningServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def StreamingSynthesize(self, request, context):
+    def CloneVoice(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Synthesize(self, request, context):
+    def GetTaskInfo(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetModelsInfo(self, request, context):
+    def DeleteVoice(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_TTSServicer_to_server(servicer, server):
+def add_VoiceCloningServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'StreamingSynthesize': grpc.unary_stream_rpc_method_handler(
-                    servicer.StreamingSynthesize,
-                    request_deserializer=tts__pb2.SynthesizeSpeechRequest.FromString,
-                    response_serializer=tts__pb2.StreamingSynthesizeSpeechResponse.SerializeToString,
+            'CloneVoice': grpc.unary_unary_rpc_method_handler(
+                    servicer.CloneVoice,
+                    request_deserializer=voice__cloning__pb2.CloneVoiceRequest.FromString,
+                    response_serializer=voice__cloning__pb2.TaskId.SerializeToString,
             ),
-            'Synthesize': grpc.unary_unary_rpc_method_handler(
-                    servicer.Synthesize,
-                    request_deserializer=tts__pb2.SynthesizeSpeechRequest.FromString,
-                    response_serializer=tts__pb2.SynthesizeSpeechResponse.SerializeToString,
+            'GetTaskInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTaskInfo,
+                    request_deserializer=voice__cloning__pb2.TaskId.FromString,
+                    response_serializer=voice__cloning__pb2.TaskInfo.SerializeToString,
             ),
-            'GetModelsInfo': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetModelsInfo,
-                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=tts__pb2.ModelsInfo.SerializeToString,
+            'DeleteVoice': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteVoice,
+                    request_deserializer=voice__cloning__pb2.DeleteVoiceRequest.FromString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'mts.ai.audiogram.tts.v2.TTS', rpc_method_handlers)
+            'mts.ai.audiogram.voice_cloning.v1.VoiceCloning', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('mts.ai.audiogram.tts.v2.TTS', rpc_method_handlers)
+    server.add_registered_method_handlers('mts.ai.audiogram.voice_cloning.v1.VoiceCloning', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class TTS(object):
+class VoiceCloning(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def StreamingSynthesize(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_stream(
-            request,
-            target,
-            '/mts.ai.audiogram.tts.v2.TTS/StreamingSynthesize',
-            tts__pb2.SynthesizeSpeechRequest.SerializeToString,
-            tts__pb2.StreamingSynthesizeSpeechResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def Synthesize(request,
+    def CloneVoice(request,
             target,
             options=(),
             channel_credentials=None,
@@ -143,9 +116,9 @@ class TTS(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/mts.ai.audiogram.tts.v2.TTS/Synthesize',
-            tts__pb2.SynthesizeSpeechRequest.SerializeToString,
-            tts__pb2.SynthesizeSpeechResponse.FromString,
+            '/mts.ai.audiogram.voice_cloning.v1.VoiceCloning/CloneVoice',
+            voice__cloning__pb2.CloneVoiceRequest.SerializeToString,
+            voice__cloning__pb2.TaskId.FromString,
             options,
             channel_credentials,
             insecure,
@@ -157,7 +130,7 @@ class TTS(object):
             _registered_method=True)
 
     @staticmethod
-    def GetModelsInfo(request,
+    def GetTaskInfo(request,
             target,
             options=(),
             channel_credentials=None,
@@ -170,9 +143,36 @@ class TTS(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/mts.ai.audiogram.tts.v2.TTS/GetModelsInfo',
-            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            tts__pb2.ModelsInfo.FromString,
+            '/mts.ai.audiogram.voice_cloning.v1.VoiceCloning/GetTaskInfo',
+            voice__cloning__pb2.TaskId.SerializeToString,
+            voice__cloning__pb2.TaskInfo.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteVoice(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/mts.ai.audiogram.voice_cloning.v1.VoiceCloning/DeleteVoice',
+            voice__cloning__pb2.DeleteVoiceRequest.SerializeToString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,

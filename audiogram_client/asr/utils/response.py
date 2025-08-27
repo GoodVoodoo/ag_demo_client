@@ -8,7 +8,7 @@ import sys
 import click
 from google.protobuf.duration_pb2 import Duration
 
-from audiogram_client.genproto import stt_pb2
+from audiogram_client.genproto import stt_response_pb2, stt_pb2
 from tabulate import tabulate
 
 
@@ -37,20 +37,20 @@ def _duration_to_str(d: Duration) -> str:
     return f"{secs:05.2f}"
 
 
-def print_va_marks(va_marks: Iterable[stt_pb2.VoiceActivityMark]) -> None:
+def print_va_marks(va_marks: Iterable[stt_response_pb2.VoiceActivityMark]) -> None:
     click.echo("\tVoice Activity Marks:")
     for mark_idx, mark in enumerate(va_marks, 1):
-        mark_type_str = stt_pb2.VoiceActivityMark.VoiceActivityMarkType.Name(mark.mark_type)
+        mark_type_str = stt_response_pb2.VoiceActivityMark.VoiceActivityMarkType.Name(mark.mark_type)
         click.echo(
             f"\t\tmark #{mark_idx}: " f"mark_type: {mark_type_str}, " f"offset_ms: {mark.offset_ms}"
         )
 
 
-def print_genderage_result(genderage: stt_pb2.SpeakerGenderAgePrediction) -> None:
+def print_genderage_result(genderage: stt_response_pb2.SpeakerGenderAgePrediction) -> None:
     click.echo("\tGenderage result:")
-    gender_name = stt_pb2.SpeakerGenderAgePrediction.GenderClass.Name(genderage.gender)
+    gender_name = stt_response_pb2.SpeakerGenderAgePrediction.GenderClass.Name(genderage.gender)
     click.echo(f"\t\tgender: {gender_name}")
-    age_name = stt_pb2.SpeakerGenderAgePrediction.AgeClass.Name(genderage.age)
+    age_name = stt_response_pb2.SpeakerGenderAgePrediction.AgeClass.Name(genderage.age)
     click.echo(f"\t\tage: {age_name}")
     emotions = genderage.emotion
     click.echo(
@@ -63,7 +63,7 @@ def print_genderage_result(genderage: stt_pb2.SpeakerGenderAgePrediction) -> Non
 
 
 def print_hypothesis(
-    hypothesis: stt_pb2.SpeechRecognitionHypothesis,
+    hypothesis: stt_response_pb2.SpeechRecognitionHypothesis,
     is_final: bool = True,
     text_file_output: bool = False,
     text_file_path: str | None = None,
@@ -112,15 +112,91 @@ def print_hypothesis(
         )
 
 
-def print_spoofing_results(results: Iterable[stt_pb2.SpoofingResult]) -> None:
+def print_spoofing_results(results: Iterable[stt_response_pb2.SpoofingResult]) -> None:
     click.echo("\tSpoofing results:")
     for result in results:
-        result_result = stt_pb2.SpoofingResult.AttackResult.Name(result.result)
+        result_result = stt_response_pb2.SpoofingResult.AttackResult.Name(result.result)
         click.echo(
             f"\t\tResult: {result_result}\n"
             f"\t\tConfidence: {result.confidence:.4g}\n"
             f"\t\tInterval: {result.start_time_ms / 1000}s - {result.end_time_ms / 1000}s"
         )
+
+
+def print_recognize_response(response: stt_response_pb2.RecognizeResponse, show_words: bool) -> None:
+    print_hypothesis(response.hypothesis, show_words)
+    print_va_marks(response.va_marks)
+    print_genderage_result(response.genderage)
+    print_spoofing_results(response.spoofing_result)
+
+
+def print_hypothesis(hypothesis: stt_response_pb2.SpeechRecognitionHypothesis, show_words: bool) -> None:
+    click.echo(
+        f"Hypothesis: {hypothesis.normalized_transcript} "
+        f"(confidence - {hypothesis.confidence:.3f})\n"
+        f"Start time: {hypothesis.start_time_ms} ms\n"
+        f"End time: {hypothesis.end_time_ms} ms\n"
+    )
+
+    if show_words:
+        print_words(hypothesis.words)
+
+
+def print_genderage(genderage: stt_response_pb2.SpeakerGenderAgePrediction) -> None:
+    if not genderage:
+        return
+
+    click.echo(
+        f"Gender: {genderage.GenderClass.Name(genderage.gender)}, "
+        f"age: {genderage.AgeClass.Name(genderage.age)}"
+    )
+
+
+def print_antispoofing(spoofing: Iterable[stt_response_pb2.SpoofingResult]) -> None:
+    if not spoofing:
+        return
+
+    click.echo("Antispoofing result:")
+    for result in spoofing:
+        click.echo(
+            f"  {result.AttackResult.Name(result.result)} "
+            f"(confidence - {result.confidence:.3f}), "
+            f"start: {result.start_time_ms} ms, "
+            f"end: {result.end_time_ms} ms"
+        )
+
+
+def print_va_marks(va_marks: Iterable[stt_response_pb2.VoiceActivityMark]) -> None:
+    if not va_marks:
+        return
+
+    click.echo("VAD marks:")
+    for mark in va_marks:
+        click.echo(
+            f"  {mark.VoiceActivityMarkType.Name(mark.mark_type)} - " f"{mark.offset_ms} ms"
+        )
+
+
+def print_words(words: Iterable[stt_response_pb2.SpeechRecognitionHypothesis.WordInfo]) -> None:
+    if not words:
+        return
+
+    table = (
+        (
+            word.word,
+            f"{word.confidence:.3f}",
+            word.start_time_ms,
+            word.end_time_ms,
+        )
+        for word in words
+    )
+    click.echo(
+        tabulate(
+            table,
+            headers=["Word", "Confidence", "Start (ms)", "End (ms)"],
+            tablefmt="presto",
+        )
+    )
 
 
 def print_recognize_response(response, is_file_response=False, text_file_output=False, audio_file=None):

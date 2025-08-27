@@ -122,3 +122,19 @@ def download_options() -> OptionsWrapper:
     ]
 
     return options_wrapper(options)
+
+
+def common_options(func):
+    func = click.option("--host", default="localhost", help="Host of the audio archive server")(func)
+    func = click.option("--port", default=8080, help="Port of the audio archive server")(func)
+    return func
+
+def request_options(func):
+    func = click.option("--request-id", required=True, help="Request ID")(func)
+    func = click.option("--audio-id", required=True, help="Audio ID")(func)
+    return func
+
+def file_options(func):
+    func = click.option("--file-name", default=None, help="File name to save")(func)
+    func = click.option("--file-dir", default=".", help="Directory to save file")(func)
+    return func

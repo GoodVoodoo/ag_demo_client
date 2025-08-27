@@ -1,51 +1,33 @@
-from datetime import datetime
-
+from typing import List, Optional
 from pydantic import BaseModel
 
 
 class Request(BaseModel):
     request_id: str
-    session_id: str | None = None
-    trace_id: str | None = None
-    created_at: datetime
+    audio_id: str
+    status: str
+    timestamp: str
 
 
-class RequestsList(BaseModel):
-    data: list[Request]
+class GetRequestsResponse(BaseModel):
+    requests: List[Request]
 
 
-class Duration(BaseModel):
-    seconds: int = 0
-    nanos: int
-
-    def __str__(self) -> str:
-        secs = self.seconds + self.nanos / 1e9
-        return f"{secs:05.2f}"
-
-
-class Word(BaseModel):
-    word: str
-    confidence: float
-    start_time: Duration
-    end_time: Duration
-
-
-class Transcript(BaseModel):
+class TranscriptItem(BaseModel):
+    start_time: float
+    end_time: float
     transcript: str
     confidence: float
-    words: list[Word]
-    start_time: Duration
-    end_time: Duration
 
 
-class TranscriptList(BaseModel):
-    data: list[Transcript]
+class GetTranscriptResponse(BaseModel):
+    transcript: List[TranscriptItem]
 
 
-class VAMark(BaseModel):
-    mark_type: str
-    offset_ms: int
+class VadItem(BaseModel):
+    start_time: float
+    end_time: float
 
 
-class VAMarkList(BaseModel):
-    data: list[VAMark]
+class GetVadResponse(BaseModel):
+    vad: List[VadItem]

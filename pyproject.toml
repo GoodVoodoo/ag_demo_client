@@ -17,7 +17,9 @@ dependencies = [
     "tabulate==0.9.0",
     "dynaconf[ini]==3.2.4",
     "python-dotenv==1.0.0",
-    "ffmpeg-python>=0.2.0"
+    "ffmpeg-python>=0.2.0",
+    "pydantic>=1.10.0",
+    "requests>=2.28.2",
 ]
 
 [project.scripts]

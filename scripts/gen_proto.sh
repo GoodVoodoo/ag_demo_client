@@ -7,11 +7,11 @@ set -e
 mkdir -p audiogram_client/genproto
 
 # Generate Python code from .proto files
-python -m grpc_tools.protoc \
+python3 -m grpc_tools.protoc \
     --proto_path=proto \
     --python_out=audiogram_client/genproto \
     --grpc_python_out=audiogram_client/genproto \
-    proto/stt.proto proto/tts.proto
+    stt.proto tts.proto response_header.proto stt_response.proto voice_cloning.proto
 
 # Add __init__.py to the generated directories to make them packages
 touch audiogram_client/genproto/__init__.py

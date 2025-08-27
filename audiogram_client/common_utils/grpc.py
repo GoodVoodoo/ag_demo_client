@@ -6,6 +6,9 @@ import grpc
 
 from audiogram_client.common_utils.config import SettingsProtocol
 from audiogram_client.genproto import stt_pb2_grpc, tts_pb2_grpc
+from dataclasses import dataclass
+from contextlib import contextmanager
+from typing import Iterator, Self
 
 
 @dataclass
@@ -59,7 +62,7 @@ def ssl_creds_from_settings(settings: SettingsProtocol) -> SSLCreds | None:
     )
 
 
-@contextlib.contextmanager
+@contextmanager
 def open_grpc_channel(address: str, ssl_creds: SSLCreds | None) -> Iterator[grpc.Channel]:
     """Open either secure or insecure connection to gRPC API."""
     if ssl_creds:

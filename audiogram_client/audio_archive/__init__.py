@@ -1,7 +1,9 @@
 import click
 
-from audiogram_client.asr.file_recognize import file_recognize
-from audiogram_client.asr.recognize import recognize
+from audiogram_client.audio_archive.save_audio import save_wav_audio
+from audiogram_client.audio_archive.save_transcript import save_transcript
+from audiogram_client.audio_archive.save_vad_marks import save_vad_marks
+from audiogram_client.audio_archive.get_requests import get_requests
 
 
 @click.group()

@@ -1,23 +1,16 @@
-from pathlib import Path
+import click
+from pydantic import ValidationError
+from requests import Response
 
 
-def save_file_dir(
-    client_id: str,
-    request_id: str,
-    trace_id: str | None = None,
-    session_id: str | None = None,
-    root: Path | None = None,
-) -> Path:
-    if not root:
-        root = Path("./request_data/")
-
-    path = root / client_id
-
-    if trace_id:
-        path = path / trace_id
-    elif session_id:
-        path = path / session_id
-
-    path = path / request_id
-
-    return path
+def process_response(response: Response, model):
+    try:
+        response.raise_for_status()
+        data = model.parse_obj(response.json())
+        return data
+    except ValidationError as e:
+        click.echo(f"Error validating response: {e}")
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"An error occurred: {e}")
+        raise click.Abort()

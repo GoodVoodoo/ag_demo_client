@@ -1,10 +1,13 @@
 import click
 import pydantic
 import requests
+import os
 
 from audiogram_client.genproto import stt_pb2
 from audiogram_client.common_utils.auth import get_auth_metadata
 from audiogram_client.common_utils.config import SettingsProtocol
+from audiogram_client.audio_archive.utils.response import process_response
+from audiogram_client.audio_archive.utils.models import GetTranscriptResponse, GetVadResponse
 
 
 def try_request(url: str) -> requests.Response:
@@ -44,3 +47,43 @@ def fetch_trace_and_session_id(
         return item.trace_id, item.session_id
 
     return None, None
+
+
+def get_and_save_data(host, port, request_id, audio_id, data_type, file_name, file_dir):
+    url = f"http://{host}:{port}/requests/{request_id}/audio/{audio_id}/{data_type}"
+    
+    if data_type == "audio":
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+        if not file_name:
+            file_name = f"{audio_id}.wav"
+        
+        file_path = os.path.join(file_dir, file_name)
+        
+        with open(file_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        
+        print(f"Audio saved to {file_path}")
+
+    else:
+        response = requests.get(url)
+        if data_type == "transcript":
+            data = process_response(response, GetTranscriptResponse)
+            if not file_name:
+                file_name = f"{audio_id}_transcript.txt"
+            file_path = os.path.join(file_dir, file_name)
+            with open(file_path, "w") as f:
+                for item in data.transcript:
+                    f.write(f"{item.start_time}-{item.end_time}: {item.transcript} (confidence: {item.confidence})\n")
+            print(f"Transcript saved to {file_path}")
+
+        elif data_type == "vad":
+            data = process_response(response, GetVadResponse)
+            if not file_name:
+                file_name = f"{audio_id}_vad.txt"
+            file_path = os.path.join(file_dir, file_name)
+            with open(file_path, "w") as f:
+                for item in data.vad:
+                    f.write(f"{item.start_time}-{item.end_time}\n")
+            print(f"VAD marks saved to {file_path}")

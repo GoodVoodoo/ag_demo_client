@@ -86,11 +86,11 @@ def make_antispoofing_config(
     far: int | None,
     frr: int | None,
     max_duration: int | None,
-) -> stt_pb2.RecognitionConfig.AntispoofingConfig:
+) -> stt_pb2.AntiSpoofingConfig:
     if not enabled:
-        return stt_pb2.RecognitionConfig.AntispoofingConfig()
+        return stt_pb2.AntiSpoofingConfig()
 
-    config = stt_pb2.RecognitionConfig.AntispoofingConfig(
+    config = stt_pb2.AntiSpoofingConfig(
         enabled=enabled,
     )
     if far is not None:
