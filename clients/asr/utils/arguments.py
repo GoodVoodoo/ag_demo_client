@@ -4,9 +4,10 @@ from typing import cast
 import click
 
 from clients.common_utils.arguments import OptionCallable, options_wrapper, OptionsWrapper
+from clients.common_utils.cli_options import audio_file_option
+from clients.common_utils.types import ASAttackType, VADAlgo, VADMode, VAResponseMode
 
 from .definitions import DEFAULT_DEP_SMOOTHED_WINDOW_MS, DEFAULT_DEP_SMOOTHED_WINDOW_THRESHOLD
-from .option_types import ASAttackType, VADAlgo, VADMode, VAResponseMode
 
 
 def common_asr_options(
@@ -53,13 +54,7 @@ def common_asr_options(
     - target_speech_vad_ending_threshold: float - Target speech VAD ending threshold
     """
     options: list = [
-        click.option(
-            "--audio-file",
-            required=True,
-            type=click.Path(exists=True, dir_okay=False),
-            help="path for audio file with recorded voice (required)",
-            metavar="<.wav path>",
-        ),
+        audio_file_option(),
         click.option(
             "--model",
             default="e2e-v3",

@@ -8,10 +8,10 @@ from clients.common_utils.auth import get_auth_metadata
 from clients.common_utils.config import SettingsProtocol
 from clients.common_utils.errors import errors_handler
 from clients.common_utils.grpc import open_grpc_channel, print_metadata, ssl_creds_from_settings
+from clients.common_utils.types import TTSVoiceStyle
 from clients.genproto import tts_pb2, tts_pb2_grpc
 
 from .utils.arguments import common_tts_options
-from .utils.option_types import TTSVoiceStyle
 from .utils.request import make_tts_request
 
 
@@ -85,6 +85,5 @@ def synthesize(
 
     click.echo(f"Received audio size: {len(response.audio)}")
 
-    # NB (k.zhovnovatiy): Received audio already contains WAV headers, so just write it
     Path(output_file).write_bytes(response.audio)
     click.echo(f"Synthesized audio stored in {output_file}")

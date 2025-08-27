@@ -98,11 +98,9 @@ def file_recognize(
         settings.iam_workspace,
         settings.verify_sso,
     )
-    
-    # Add required headers for v3
     auth_metadata.append(("x-ai-account", "demo"))
     auth_metadata.append(("x-ai-workspace", "default"))
-    
+
     audio = AudioFile(audio_file)
 
     click.echo(
@@ -168,12 +166,6 @@ def file_recognize(
         wfst_config,
         split_by_channel,
     )
-    request = stt_pb2.FileRecognizeRequest(
-        config=recognition_config,
-        audio=audio.blob,
-    )
-
-    # Optional: print JSON representation of request config and metadata
     if dump_json_request:
         try:
             config_json = MessageToJson(
@@ -182,9 +174,6 @@ def file_recognize(
             )
             click.echo("\n--- JSON Request (RecognitionConfig) ---\n")
             click.echo(config_json)
-            click.echo("\n--- Audio Payload ---\n")
-            click.echo(f"bytes: {len(audio.blob)} (not printed)")
-            click.echo()
         except Exception as exc:
             click.echo(f"Failed to dump JSON request: {exc}\n")
 

@@ -80,26 +80,24 @@ def make_va_config(
 
 
 def make_antispoofing_config(
-    enable: bool,
+    enabled: bool,
     attack_type: ASAttackType | None,
     far: int | None,
     frr: int | None,
-    max_duration_for_analysis_ms: int | None,
-) -> stt_pb2.AntiSpoofingConfig:
-    if not enable:
-        return stt_pb2.AntiSpoofingConfig(enable=False)
+    max_duration: int | None,
+) -> stt_pb2.RecognitionConfig.AntispoofingConfig:
+    if not enabled:
+        return stt_pb2.RecognitionConfig.AntispoofingConfig()
 
-    config = stt_pb2.AntiSpoofingConfig(enable=True)
-    
-    # Note: AttackType field is removed in v3, it's now reserved
-    
+    config = stt_pb2.RecognitionConfig.AntispoofingConfig(
+        enabled=enabled,
+    )
     if far is not None:
-        config.FAR = far
-    elif frr is not None:
-        config.FRR = frr
-
-    if max_duration_for_analysis_ms is not None:
-        config.max_duration_for_analysis_ms = max_duration_for_analysis_ms
+        config.far = far
+    if frr is not None:
+        config.frr = frr
+    if max_duration is not None:
+        config.max_duration_for_analysis = max_duration
 
     return config
 

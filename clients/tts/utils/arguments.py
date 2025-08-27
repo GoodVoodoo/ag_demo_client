@@ -4,8 +4,8 @@ from typing import cast
 import click
 
 from clients.common_utils.arguments import options_wrapper, OptionsWrapper
-
-from .option_types import TTSVoiceStyle
+from clients.common_utils.cli_options import output_file_option, text_option
+from clients.common_utils.types import TTSVoiceStyle
 
 
 def common_tts_options() -> OptionsWrapper:
@@ -22,21 +22,8 @@ def common_tts_options() -> OptionsWrapper:
         - voice_style: TTSVoiceStyle - TTS voice style
     """
     options: list = [
-        click.option(
-            "--text",
-            required=True,
-            help="text or SSML (if --read-ssml enabled) for speech synthesis",
-            metavar="<text>",
-        ),
-        click.option(
-            "--save-to",
-            "output_file",
-            type=click.Path(file_okay=True, dir_okay=False, writable=True),
-            default="synthesized_audio.wav",
-            help="output audio file path",
-            metavar="<file path>",
-            show_default=True,
-        ),
+        text_option(),
+        output_file_option("synthesized_audio.wav"),
         click.option(
             "--read-ssml",
             "is_ssml",

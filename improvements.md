@@ -8,7 +8,7 @@ Use this checklist to track architectural and codebase improvements. Items marke
 - [x] Add `.pre-commit-config.yaml` with checks (ruff, mypy, basic hooks)
 - [ ] Enable pre-commit for contributors (`pre-commit install` in local clones)
 - [x] Delete stray script `Demo_Roskvartal/2ch_wav/process_dialogues.py`
-- [ ] Audit `SPK-13769/` assets and remove if unused
+- [x] Audit `SPK-13769/` assets and remove if unused
 
 #### Packaging & distribution
 - [x] Standardize on Hatchling in `pyproject.toml` (remove Setuptools stanza)
@@ -24,11 +24,11 @@ Use this checklist to track architectural and codebase improvements. Items marke
 - [ ] Auto-generate CLI reference (e.g., via `sphinx-click` or scripted `--help` dumps)
 
 #### Code organisation & quality
-- [ ] Consolidate shared Click options into `clients/common_utils/cli_options.py`
+- [x] Consolidate shared Click options into `clients/common_utils/cli_options.py`
 - [ ] Introduce `ModelService` abstraction and wire a comprehensive `models info` command
-- [ ] Replace `print` with `logging` in `audio_converter.py` and other CLIs, add `--verbose`
+- [x] Replace `print` with `logging` in `audio_converter.py` and other CLIs, add `--verbose`
 - [ ] Move shared enums/types from service-specific utils into `clients/common_utils/types.py`
-- [ ] Remove commented-out code and dead exports across the repo
+- [x] Remove commented-out code and dead exports across the repo
 
 #### Testing & CI
 - [x] Add pytest configuration (via `pyproject.toml`)

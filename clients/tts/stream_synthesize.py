@@ -9,11 +9,11 @@ from clients.common_utils.auth import get_auth_metadata
 from clients.common_utils.config import SettingsProtocol
 from clients.common_utils.errors import errors_handler
 from clients.common_utils.grpc import open_grpc_channel, print_metadata, ssl_creds_from_settings
+from clients.common_utils.types import TTSVoiceStyle
 from clients.genproto import tts_pb2, tts_pb2_grpc
 
 from .utils.arguments import common_tts_options
 from .utils.definitions import AUDIO_SAVE_CHANNELS, AUDIO_SAVE_SAMPLE_WIDTH
-from .utils.option_types import TTSVoiceStyle
 from .utils.request import make_tts_request
 
 

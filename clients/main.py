@@ -4,61 +4,57 @@ import click
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 
-from clients import asr, tts
-from clients.common_utils.config import create_config
-# from clients.models_service import models_info as comprehensive_models_info
+from clients.asr.file_recognize import file_recognize
+from clients.asr.get_models_info import get_models_info as asr_get_models_info
+from clients.asr.recognize import recognize
+from clients.audio_archive.__main__ import audio_archive
+from clients.tts.get_models_info import get_models_info as tts_get_models_info
+from clients.tts.stream_synthesize import stream_synthesize
+from clients.tts.synthesize import synthesize
 
-# NB (k.zhovnovatiy): Disable warning from unsafe Keycloak connection (--verify-sso false)
 urllib3.disable_warnings(InsecureRequestWarning)
 
 
 @click.group()
-def main() -> None:
+def audiogram_cli():
     pass
 
 
-@click.group(
-    "recognize",
-    help="Speech Recognition commands",
-)
-def asr_group() -> None:
+@click.group(help="Speech-To-Text (ASR) commands")
+def asr_group():
+    """Group for ASR commands."""
     pass
 
 
-@click.group(
-    "models",
-    help="Model info retrieval commands",
-)
-def models_group() -> None:
+@click.group(help="Text-To-Speech (TTS) commands")
+def tts_group():
+    """Group for TTS commands."""
     pass
 
 
-@click.group(
-    "synthesize",
-    help="Text-to-Speech (TTS) commands",
-)
-def tts_group() -> None:
+@click.group(help="Get information about available models")
+def models_group():
+    """Group for model information commands."""
     pass
 
 
-asr_group.add_command(asr.file_recognize, "file")
-asr_group.add_command(asr.recognize, "stream")
+asr_group.add_command(recognize, "stream")
+asr_group.add_command(file_recognize, "file")
+models_group.add_command(asr_get_models_info, "asr")
 
-tts_group.add_command(tts.synthesize, "file")
-tts_group.add_command(tts.stream_synthesize, "stream")
+tts_group.add_command(synthesize, "file")
+tts_group.add_command(stream_synthesize, "stream")
+models_group.add_command(tts_get_models_info, "tts")
 
-# Individual model info commands
-models_group.add_command(asr.get_models_info, "recognize")
-models_group.add_command(tts.get_models_info, "synthesize")
+audiogram_cli.add_command(asr_group, "asr")
+audiogram_cli.add_command(tts_group, "tts")
+audiogram_cli.add_command(models_group, "models")
+audiogram_cli.add_command(audio_archive, "archive")
 
-# Comprehensive model info command
-# models_group.add_command(comprehensive_models_info, "info")
 
-main.add_command(asr_group)
-main.add_command(tts_group)
-main.add_command(models_group)
-main.add_command(create_config, "create-config")
+def main():
+    audiogram_cli()
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

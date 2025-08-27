@@ -10,6 +10,7 @@ from clients.common_utils.auth import get_auth_metadata
 from clients.common_utils.config import SettingsProtocol
 from clients.common_utils.errors import errors_handler
 from clients.common_utils.grpc import open_grpc_channel, print_metadata, ssl_creds_from_settings
+from clients.common_utils.types import ASAttackType, VADAlgo, VADMode, VAResponseMode
 from clients.genproto import stt_pb2, stt_pb2_grpc
 
 from .utils.arguments import common_asr_options
@@ -20,7 +21,6 @@ from .utils.definitions import (
     DEFAULT_VAD_S_SPEECH_PAD_MS,
     DEFAULT_VAD_S_THRESHOLD,
 )
-from .utils.option_types import ASAttackType, VADAlgo, VADMode, VAResponseMode
 from .utils.request import (
     make_antispoofing_config,
     make_context_dictionary_config,
@@ -124,8 +124,6 @@ def recognize(
         settings.iam_workspace,
         settings.verify_sso,
     )
-    
-    # Add required headers for v3
     auth_metadata.append(("x-ai-account", "demo"))
     auth_metadata.append(("x-ai-workspace", "default"))
 
@@ -199,7 +197,6 @@ def recognize(
         single_utterance=single_utterance,
         interim_results=interim_results,
     )
-    # Optional: print JSON representation for stream request
     if dump_json_request:
         try:
             config_json = MessageToJson(
@@ -217,7 +214,6 @@ def recognize(
                     "realtime": realtime,
                 }
             )
-            # Metadata intentionally not printed per request
             click.echo()
         except Exception as exc:
             click.echo(f"Failed to dump JSON request: {exc}\n")
