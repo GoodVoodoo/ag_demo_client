@@ -16,6 +16,8 @@ pip install -e .
 
 Before you can use the clients, you need to create a `config.ini` file. A template is provided in `clients/common_utils/config_files/settings_template.ini`. Copy this file to the root of the project and rename it to `config.ini`, then fill in your credentials.
 
+Alternatively, you can configure the client using environment variables. All settings in the `config.ini` file can be overridden by environment variables prefixed with `AUDIOGRAM_`. For example, to set the API address, you would use an environment variable named `AUDIOGRAM_API_ADDRESS`.
+
 ## Usage
 
 The main entry point for the CLI is `audiogram`. You can see a list of available commands by running:

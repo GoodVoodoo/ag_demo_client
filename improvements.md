@@ -45,7 +45,7 @@ Use this checklist to track architectural and codebase improvements. Items marke
 
 #### Configuration & security
 - [x] Ensure `config.ini` is ignored by default
-- [ ] Review auth/config flows; consider optional environment variable support for CI
+- [x] Review auth/config flows; consider optional environment variable support for CI
 
 #### Developer experience
 - [x] Add `.editorconfig` for consistent formatting across editors
