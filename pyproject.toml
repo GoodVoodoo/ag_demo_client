@@ -21,10 +21,10 @@ dependencies = [
 ]
 
 [project.scripts]
-audiogram = "clients.main:main"
+audiogram = "audiogram_cli.main:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["clients"]
+packages = ["audiogram_client", "audiogram_cli"]
 
 [project.optional-dependencies]
 dev = [

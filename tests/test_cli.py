@@ -1,6 +1,6 @@
 from click.testing import CliRunner
 
-from clients.main import audiogram_cli
+from audiogram_cli.main import audiogram_cli
 
 
 def test_audiogram_cli_help(runner: CliRunner):

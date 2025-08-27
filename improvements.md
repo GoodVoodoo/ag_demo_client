@@ -34,7 +34,7 @@ Use this checklist to track architectural and codebase improvements. Items marke
 - [x] Add pytest configuration (via `pyproject.toml`)
 - [x] Add ruff and mypy configuration (strict defaults)
 - [ ] Add initial test suite:
-  - [ ] CLI smoke tests with `CliRunner`
+  - [x] CLI smoke tests with `CliRunner`
   - [ ] Config validation tests
   - [ ] Proto round-trip tests
 - [ ] Set up GitHub Actions workflow: lint (ruff), type-check (mypy), tests (pytest)
