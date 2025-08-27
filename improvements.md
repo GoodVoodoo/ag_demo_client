@@ -16,7 +16,7 @@ Use this checklist to track architectural and codebase improvements. Items marke
 - [x] Declare `ffmpeg-python` runtime dependency for `audio_converter.py`
 - [x] Add `dev` optional extra (ruff, mypy, pytest, pre-commit)
 - [x] Ensure wheel build includes `clients/` via Hatch build config
-- [ ] Restructure package names (expose library as `audiogram_client`, keep CLI as `audiogram_cli`) and update imports
+- [x] Restructure package names (expose library as `audiogram_client`, keep CLI as `audiogram_cli`) and update imports
 
 #### Documentation
 - [x] Update README to prefer `audiogram` CLI over `python -m clients.main`
@@ -37,11 +37,11 @@ Use this checklist to track architectural and codebase improvements. Items marke
   - [x] CLI smoke tests with `CliRunner`
   - [ ] Config validation tests
   - [ ] Proto round-trip tests
-- [ ] Set up GitHub Actions workflow: lint (ruff), type-check (mypy), tests (pytest)
+- [x] Set up GitHub Actions workflow: lint (ruff), type-check (mypy), tests (pytest)
 
 #### Proto management
-- [ ] Add regeneration script/task for `clients/genproto` from `proto/` (pin protoc/protobuf versions)
-- [ ] Document regeneration process in `docs/architecture.md`
+- [x] Add regeneration script/task for `clients/genproto` from `proto/` (pin protoc/protobuf versions)
+- [x] Document regeneration process in `docs/architecture.md`
 
 #### Configuration & security
 - [x] Ensure `config.ini` is ignored by default
@@ -49,7 +49,7 @@ Use this checklist to track architectural and codebase improvements. Items marke
 
 #### Developer experience
 - [x] Add `.editorconfig` for consistent formatting across editors
-- [ ] Provide `Makefile` or `invoke` tasks for common operations (lint, test, proto-gen, docs)
+- [x] Provide `Makefile` or `invoke` tasks for common operations (lint, test, proto-gen, docs)
 
 ---
 

@@ -21,3 +21,13 @@ The project is organized into the following main directories:
 - **ModelService (`clients/models_service.py`):** A service that provides a unified interface for fetching model information from the ASR and TTS services.
 - **gRPC Clients:** The clients use `grpcio` to communicate with the backend gRPC services.
 - **Configuration:** The clients are configured using a `config.ini` file, with settings that can be overridden by command-line arguments.
+
+## Protobuf Generation
+
+The Python gRPC client code in `audiogram_client/genproto/` is generated from the `.proto` files in the `proto/` directory. To regenerate the client code after making changes to the `.proto` files, run the following command from the root of the project:
+
+```bash
+make proto-gen
+```
+
+This command uses the `scripts/gen_proto.sh` script to invoke the `grpc_tools.protoc` compiler with the correct parameters. You will need to have the `grpcio-tools` package installed, which is included in the `dev` dependencies.
