@@ -12,6 +12,7 @@ from audiogram_client.common_utils.config import SettingsProtocol
 from audiogram_client.common_utils.errors import errors_handler
 from audiogram_client.common_utils.grpc import open_grpc_channel, ssl_creds_from_settings
 from audiogram_client.genproto import stt_pb2, stt_pb2_grpc, tts_pb2, tts_pb2_grpc
+from google.protobuf.empty_pb2 import Empty
 
 
 class ModelServiceType(Enum):
@@ -56,7 +57,7 @@ class ModelService:
         return asr_models + tts_models
 
     def _get_asr_models(self, stub: stt_pb2_grpc.STTStub) -> List[ModelInfo]:
-        request = stt_pb2.GetModelsInfoRequest()
+        request = Empty()
         try:
             response: stt_pb2.ModelsInfo = stub.GetModelsInfo(
                 request,
@@ -79,7 +80,7 @@ class ModelService:
             return []
 
     def _get_tts_models(self, stub: tts_pb2_grpc.TTSStub) -> List[ModelInfo]:
-        request = tts_pb2.GetModelsInfoRequest()
+        request = Empty()
         try:
             response: tts_pb2.ModelsInfo = stub.GetModelsInfo(
                 request,

@@ -200,10 +200,10 @@ class Settings(Dynaconf):
         super().__init__(
             settings_files=settings_files,
             core_loaders=["INI"],  # NB (k.zhovnovatiy): Remove all loaders except .ini
-            loaders=[],  # NB (k.zhovnovatiy): Disable env_loader
+            loaders=["dynaconf.loaders.env_loader"],  # Enable env_loader for environment variables
             environments=False,
-            load_dotenv=False,
-            envvar_prefix=False,
+            load_dotenv=True,  # Enable .env file loading
+            envvar_prefix="AUDIOGRAM",  # Use AUDIOGRAM_ prefix for env vars
         )
 
         # NB (k.zhovnovatiy): Add validators separately to control when they are applied
