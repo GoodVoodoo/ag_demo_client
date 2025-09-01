@@ -6,9 +6,10 @@ This document provides a high-level overview of the Audiogram Demo Clients archi
 
 The project is organized into the following main directories:
 
-- `clients/`: Contains the source code for the ASR, TTS, and other clients.
+- `clients/`: Contains the source code for the ASR, TTS, Voice Cloning, and other clients.
   - `asr/`: ASR-specific commands and utilities.
   - `tts/`: TTS-specific commands and utilities.
+  - `voice_cloning/`: Voice cloning commands and utilities.
   - `common_utils/`: Shared utilities for configuration, authentication, and gRPC communication.
   - `genproto/`: Generated Python code from the `.proto` files.
 - `docs/`: Project documentation.

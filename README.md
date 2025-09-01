@@ -1,6 +1,6 @@
 # Audiogram Demo Clients
 
-This repository contains a set of demonstration clients for the Audiogram gRPC API. These clients provide a command-line interface for interacting with the ASR (Speech-to-Text) and TTS (Text-to-Speech) services.
+This repository contains a set of demonstration clients for the Audiogram gRPC API. These clients provide a command-line interface for interacting with the ASR (Speech-to-Text), TTS (Text-to-Speech), and Voice Cloning services.
 
 ## Documentation
 

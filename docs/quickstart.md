@@ -26,7 +26,7 @@ The main entry point for the CLI is `audiogram`. You can see a list of available
 audiogram --help
 ```
 
-Here are some examples of how to use the ASR and TTS clients:
+Here are some examples of how to use the ASR, TTS, and Voice Cloning clients:
 
 ### ASR (Speech-to-Text)
 
@@ -43,3 +43,45 @@ To synthesize speech from text:
 ```bash
 audiogram tts file --text "Hello, world!" --save-to output.wav --voice-name elena
 ```
+
+### Voice Cloning
+
+Voice cloning allows you to create personalized voices from audio samples. The process involves three main steps:
+
+#### 1. Clone a Voice
+
+First, create a voice cloning task from an audio sample:
+
+```bash
+audiogram vc clone --audio-file /path/to/voice/sample.wav
+```
+
+This returns a task ID that you'll use to check the status.
+
+#### 2. Check Cloning Status
+
+Monitor the cloning progress using the task ID:
+
+```bash
+audiogram vc get-task-info --task-id YOUR_TASK_ID
+```
+
+Wait until the status shows "Ready" and note the voice ID.
+
+#### 3. Use Your Cloned Voice
+
+Once ready, use the cloned voice for speech synthesis:
+
+```bash
+audiogram tts file --text "Hello from my cloned voice!" --voice-name YOUR_VOICE_ID --save-to cloned_speech.wav
+```
+
+#### Optional: Delete a Cloned Voice
+
+When no longer needed, delete the cloned voice:
+
+```bash
+audiogram vc delete --voice-id YOUR_VOICE_ID
+```
+
+**Important:** Voice cloning involves personal data. Ensure you have proper consent before cloning someone's voice and comply with applicable privacy laws.
