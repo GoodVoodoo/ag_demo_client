@@ -44,7 +44,7 @@ def clone_voice(
 
     request = voice_cloning_pb2.CloneVoiceRequest(
         audio_format=audio_format,
-        signal=audio.read(),
+        signal=audio.blob,
     )
 
     click.echo(f"Connecting to gRPC server - {settings.api_address}\n")
