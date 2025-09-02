@@ -32,6 +32,7 @@ def synthesize(
     model_type: str | None,
     model_sample_rate: int | None,
     voice_style: TTSVoiceStyle,
+    language_code: str | None,
 ) -> None:
     auth_metadata = get_auth_metadata(
         settings.sso_url,
@@ -51,6 +52,7 @@ def synthesize(
         f"Voice style: {voice_style}\n"
         f"Model type: {model_type or 'auto'}\n"
         f"Model sample rate: {model_sample_rate or 'auto'}\n"
+        f"Language code: {language_code or 'ru (default)'}\n"
     )
 
     request = make_tts_request(
@@ -61,6 +63,7 @@ def synthesize(
         model_type,
         model_sample_rate,
         voice_style,
+        language_code,
     )
 
     click.echo(f"Connecting to gRPC server - {settings.api_address}\n")

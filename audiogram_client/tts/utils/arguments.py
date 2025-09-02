@@ -20,6 +20,7 @@ def common_tts_options() -> OptionsWrapper:
         - model_type: str | None - TTS model type
         - model_sample_rate: int | None - model sample rate (optional)
         - voice_style: TTSVoiceStyle - TTS voice style
+        - language_code: str | None - language code (e.g., 'en', 'ru')
     """
     options: list = [
         text_option(),
@@ -65,6 +66,13 @@ def common_tts_options() -> OptionsWrapper:
             default="neutral",
             help="emotion style for speech synthesis",
             show_default=True,
+        ),
+        click.option(
+            "--language-code",
+            default=None,
+            help="language code for synthesis (e.g., 'en' for English, 'ru' for Russian)",
+            metavar="<code>",
+            show_default="ru",
         ),
     ]
 
