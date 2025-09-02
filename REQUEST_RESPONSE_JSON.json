@@ -1,0 +1,193 @@
+{
+  "request_response_pairs": {
+    "pair_1_openssl_working": {
+      "status": "SUCCESS",
+      "request": {
+        "tool": "openssl",
+        "command": "openssl s_client -connect asr-tts-ha.dev.sf.audiokit.mts-corp.ru:443 -servername asr-tts-ha.dev.sf.audiokit.mts-corp.ru -alpn h2",
+        "protocol": "TLS/HTTP",
+        "target": "asr-tts-ha.dev.sf.audiokit.mts-corp.ru:443",
+        "tls_version": "1.3",
+        "alpn_offered": ["h2"],
+        "sni": "asr-tts-ha.dev.sf.audiokit.mts-corp.ru",
+        "certificate_validation": true
+      },
+      "response": {
+        "status_code": "SUCCESS",
+        "alpn_selected": "h2",
+        "tls_version": "TLSv1.3",
+        "cipher": "AEAD-AES256-GCM-SHA384",
+        "certificate_chain": {
+          "depth_0": "CN=k8s-cluster-dev-sf",
+          "depth_1": "DC=ru, DC=mts, DC=msk, CN=winca G2",
+          "depth_2": "C=RU, O=Mobile TeleSystems PJSC, CN=MTS Class 2 Root CA"
+        },
+        "connection_established": true,
+        "http2_ready": true
+      }
+    },
+    "pair_2_curl_working": {
+      "status": "SUCCESS", 
+      "request": {
+        "tool": "curl",
+        "command": "curl -v --http2 https://asr-tts-ha.dev.sf.audiokit.mts-corp.ru:443",
+        "protocol": "HTTP/2",
+        "target": "asr-tts-ha.dev.sf.audiokit.mts-corp.ru:443",
+        "alpn_offered": ["h2", "http/1.1"],
+        "method": "GET",
+        "headers": {
+          "user-agent": "curl/8.7.1",
+          "accept": "*/*"
+        }
+      },
+      "response": {
+        "status_code": "SUCCESS",
+        "alpn_selected": "h2",
+        "protocol": "HTTP/2",
+        "tls_version": "TLSv1.3",
+        "cipher": "AEAD-AES256-GCM-SHA384",
+        "connection_established": true,
+        "http2_active": true
+      }
+    },
+    "pair_3_grpc_python_failing": {
+      "status": "FAILURE",
+      "request": {
+        "tool": "grpc-python",
+        "protocol": "gRPC over HTTP/2",
+        "target": "asr-tts-ha.dev.sf.audiokit.mts-corp.ru:443",
+        "grpc_version": "1.74.0",
+        "channel_type": "secure_channel",
+        "credentials": "ssl_channel_credentials",
+        "alpn_expected": "h2",
+        "operation": "channel_ready_future",
+        "timeout": 5
+      },
+      "response": {
+        "status_code": "FAILURE",
+        "error_type": "FutureTimeoutError",
+        "grpc_status": "UNAVAILABLE",
+        "error_message": "failed to connect to all addresses; last error: UNKNOWN: ipv4:178.248.237.216:443: Cannot check peer: missing selected ALPN property.",
+        "alpn_validation": "FAILED",
+        "connection_established": false,
+        "timeout_occurred": true
+      }
+    },
+    "pair_4_tts_synthesis_failing": {
+      "status": "FAILURE",
+      "request": {
+        "service": "audiogram.tts.TTS",
+        "method": "Synthesize",
+        "protocol": "gRPC over HTTP/2",
+        "target": "asr-tts-ha.dev.sf.audiokit.mts-corp.ru:443",
+        "headers": {
+          "content-type": "application/grpc",
+          "authorization": "Bearer [JWT_TOKEN]",
+          "user-agent": "grpc-python/1.74.0",
+          "te": "trailers"
+        },
+        "payload": {
+          "text": "Тестирование AudioKit Dev SF прошло успешно",
+          "language_code": "ru",
+          "encoding": "LINEAR_PCM",
+          "sample_rate_hertz": 22050,
+          "voice_name": "gandzhaev",
+          "synthesize_options": {}
+        },
+        "binary_size_bytes": 93,
+        "authentication": {
+          "type": "Bearer JWT",
+          "keycloak_endpoint": "https://isso.mts.ru/auth/realms/mts/protocol/openid-connect/token",
+          "grant_type": "client_credentials",
+          "client_id": "audiogram-dev"
+        }
+      },
+      "response": {
+        "status_code": "FAILURE",
+        "error_type": "grpc._channel._InactiveRpcError",
+        "grpc_status": "UNAVAILABLE",
+        "error_details": "failed to connect to all addresses; last error: UNKNOWN: ipv4:178.248.237.216:443: Cannot check peer: missing selected ALPN property.",
+        "debug_error_string": "UNKNOWN:Error received from peer {grpc_status:14, grpc_message:\"failed to connect to all addresses; last error: UNKNOWN: ipv4:178.248.237.216:443: Cannot check peer: missing selected ALPN property.\"}",
+        "alpn_validation": "FAILED",
+        "connection_established": false,
+        "audio_data_received": false
+      }
+    },
+    "pair_5_grpcurl_failing": {
+      "status": "FAILURE",
+      "request": {
+        "tool": "grpcurl",
+        "command": "grpcurl -insecure asr-tts-ha.dev.sf.audiokit.mts-corp.ru:443 list",
+        "protocol": "gRPC over HTTP/2",
+        "target": "asr-tts-ha.dev.sf.audiokit.mts-corp.ru:443",
+        "operation": "service_reflection",
+        "insecure_mode": true
+      },
+      "response": {
+        "status_code": "FAILURE",
+        "error_type": "connection_timeout",
+        "error_message": "Failed to dial target host",
+        "context": "deadline exceeded",
+        "connection_established": false,
+        "services_listed": false
+      }
+    }
+  },
+  "analysis": {
+    "working_protocols": {
+      "openssl": {
+        "alpn_negotiation": "SUCCESS",
+        "alpn_selected": "h2",
+        "reason": "Direct TLS/ALPN works"
+      },
+      "curl_http2": {
+        "alpn_negotiation": "SUCCESS", 
+        "alpn_selected": "h2",
+        "reason": "HTTP/2 over ALPN works"
+      }
+    },
+    "failing_protocols": {
+      "grpc_python": {
+        "alpn_negotiation": "FAILED",
+        "error": "missing selected ALPN property",
+        "reason": "gRPC ALPN validation issue"
+      },
+      "grpc_synthesis": {
+        "alpn_negotiation": "FAILED",
+        "error": "missing selected ALPN property", 
+        "reason": "Cannot reach TTS service due to ALPN"
+      },
+      "grpcurl": {
+        "alpn_negotiation": "FAILED",
+        "error": "connection timeout",
+        "reason": "gRPC reflection fails"
+      }
+    },
+    "pattern": {
+      "http2_alpn_works": true,
+      "grpc_alpn_fails": true,
+      "same_server": true,
+      "same_alpn_extension": true,
+      "root_cause": "Server-side gRPC ALPN configuration issue"
+    }
+  },
+  "evidence_summary": {
+    "server_supports_alpn": true,
+    "server_supports_http2": true,
+    "grpc_service_misconfigured": true,
+    "client_configuration_correct": true,
+    "certificates_valid": true,
+    "authentication_working": true,
+    "issue_location": "server_side_grpc_alpn_validation"
+  },
+  "next_steps": {
+    "action": "contact_audiokit_dev_sf_support",
+    "evidence_files": [
+      "REQUEST_RESPONSE_JSON.json",
+      "RAW_SERVER_RESPONSES.md", 
+      "ORIGINAL_REQUEST_ANALYSIS.md",
+      "AUDIOKIT_DEV_SF_SUPPORT_REQUEST.md"
+    ],
+    "key_message": "Server accepts HTTP/2 ALPN from OpenSSL/curl but rejects identical ALPN from gRPC clients with 'missing selected ALPN property' error"
+  }
+}
