@@ -432,6 +432,201 @@ class TestIntegration:
         print(f"✅ Audio file test passed: File '{test_audio_file}' exists ({file_size} bytes)")
 
 
+class TestAudioKitDevSFIntegration:
+    """Integration tests specifically for AudioKit Dev SF endpoint."""
+
+    @pytest.fixture(scope="class")
+    def dev_sf_settings(self):
+        """Create settings instance for AudioKit Dev SF tests."""
+        config_path = Path(__file__).parent.parent / "config_audiokit_dev_sf.ini"
+        if not config_path.exists():
+            pytest.skip(f"AudioKit Dev SF config file not found: {config_path}")
+        
+        settings = Settings([str(config_path)])
+        
+        # Validate that credentials are available
+        try:
+            settings.validators.validate()
+        except Exception as e:
+            pytest.skip(f"AudioKit Dev SF configuration validation failed: {e}")
+        
+        return settings
+
+    def test_dev_sf_credentials_available(self, dev_sf_settings):
+        """
+        Test that AudioKit Dev SF credentials are available.
+        
+        This is a prerequisite test to ensure other tests can run.
+        """
+        assert dev_sf_settings.client_id, "AUDIOGRAM_CLIENT_ID is not configured for AudioKit Dev SF"
+        assert dev_sf_settings.client_secret, "AUDIOGRAM_CLIENT_SECRET is not configured for AudioKit Dev SF"
+        assert dev_sf_settings.api_address, "API address is not configured for AudioKit Dev SF"
+        assert dev_sf_settings.api_address == "asr-tts-ha.dev.sf.audiokit.mts-corp.ru:443", "Incorrect AudioKit Dev SF endpoint"
+        
+        print("✅ AudioKit Dev SF credentials test passed: All required configuration is available")
+
+    def test_dev_sf_certificate_setup(self, dev_sf_settings):
+        """
+        Test that the required certificate file exists for AudioKit Dev SF.
+        """
+        cert_path = Path(__file__).parent.parent / "WinCAG2ANDclass2root.pem"
+        if not cert_path.exists():
+            pytest.skip(f"Certificate file not found: {cert_path}. Please follow CERTIFICATE_SETUP_DEV_SF.md instructions")
+        
+        # Check that it's not just a placeholder
+        cert_content = cert_path.read_text()
+        if "placeholder" in cert_content.lower() or cert_content.startswith("#"):
+            pytest.skip("Certificate file appears to be a placeholder. Please replace with actual certificate content")
+        
+        print(f"✅ AudioKit Dev SF certificate test passed: Certificate file exists at {cert_path}")
+
+    def test_dev_sf_tts_gandzhaev_voice(self, dev_sf_settings):
+        """
+        Test TTS synthesis with gandzhaev voice on AudioKit Dev SF endpoint.
+        
+        Synthesizes the phrase "Тестирование AudioKit Dev SF прошло успешно" 
+        and verifies that audio is generated successfully.
+        """
+        from audiogram_client.tts.utils.request import make_tts_request
+        from audiogram_client.common_utils.auth import get_auth_metadata
+        from audiogram_client.common_utils.grpc import open_grpc_channel, ssl_creds_from_settings
+        from audiogram_client.genproto import tts_pb2, tts_pb2_grpc
+        
+        test_text = "Тестирование AudioKit Dev SF прошло успешно"
+        voice_name = "gandzhaev"
+        
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+            output_file = temp_file.name
+        
+        try:
+            # Get auth metadata
+            auth_metadata = get_auth_metadata(
+                dev_sf_settings.sso_url,
+                dev_sf_settings.realm,
+                dev_sf_settings.client_id,
+                dev_sf_settings.client_secret,
+                dev_sf_settings.iam_account,
+                dev_sf_settings.iam_workspace,
+                dev_sf_settings.verify_sso,
+            )
+
+            # Create TTS request
+            request = make_tts_request(
+                text=test_text,
+                is_ssml=False,
+                voice_name=voice_name,
+                rate=22050,  # gandzhaev voice supports 22050 Hz
+                model_type=None,  # Auto-detect
+                model_rate=None,  # Auto-detect
+                voice_style=TTSVoiceStyle.neutral,
+            )
+
+            # Make gRPC call
+            with open_grpc_channel(
+                dev_sf_settings.api_address,
+                ssl_creds_from_settings(dev_sf_settings),
+            ) as channel:
+                stub = tts_pb2_grpc.TTSStub(channel)
+
+                response: tts_pb2.SynthesizeSpeechResponse
+                response, call = stub.Synthesize.with_call(
+                    request,
+                    metadata=auth_metadata,
+                    timeout=dev_sf_settings.timeout,
+                )
+
+            # Save audio to file
+            Path(output_file).write_bytes(response.audio)
+            
+            # Verify that audio file was created and has content
+            assert os.path.exists(output_file), "AudioKit Dev SF TTS output file was not created"
+            
+            file_size = os.path.getsize(output_file)
+            assert file_size > 1000, f"AudioKit Dev SF TTS output file too small: {file_size} bytes"
+            
+            print(f"✅ AudioKit Dev SF TTS test passed: Generated {file_size} bytes of audio for text '{test_text}' with voice '{voice_name}'")
+            print(f"   Endpoint: {dev_sf_settings.api_address}")
+            
+        finally:
+            # Clean up temporary file
+            if os.path.exists(output_file):
+                os.unlink(output_file)
+
+    def test_dev_sf_tts_english_voice(self, dev_sf_settings):
+        """
+        Test English TTS synthesis on AudioKit Dev SF endpoint.
+        
+        Synthesizes an English phrase using voice 2 with the eng voice model
+        and verifies that audio is generated successfully.
+        """
+        from audiogram_client.tts.utils.request import make_tts_request
+        from audiogram_client.common_utils.auth import get_auth_metadata
+        from audiogram_client.common_utils.grpc import open_grpc_channel, ssl_creds_from_settings
+        from audiogram_client.genproto import tts_pb2, tts_pb2_grpc
+        
+        test_text = "Hello, this is an AudioKit Dev SF English text-to-speech integration test."
+        voice_name = "voice 2"
+        model_type = "eng voice"
+        
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+            output_file = temp_file.name
+        
+        try:
+            # Get auth metadata
+            auth_metadata = get_auth_metadata(
+                dev_sf_settings.sso_url,
+                dev_sf_settings.realm,
+                dev_sf_settings.client_id,
+                dev_sf_settings.client_secret,
+                dev_sf_settings.iam_account,
+                dev_sf_settings.iam_workspace,
+                dev_sf_settings.verify_sso,
+            )
+
+            # Create TTS request
+            request = make_tts_request(
+                text=test_text,
+                is_ssml=False,
+                voice_name=voice_name,
+                rate=22050,  # English voices support 22050 Hz
+                model_type=model_type,
+                model_rate=None,  # Auto-detect
+                voice_style=TTSVoiceStyle.neutral,
+                language_code=None,  # Use default (ru) as per model configuration
+            )
+
+            # Make gRPC call
+            with open_grpc_channel(
+                dev_sf_settings.api_address,
+                ssl_creds_from_settings(dev_sf_settings),
+            ) as channel:
+                stub = tts_pb2_grpc.TTSStub(channel)
+
+                response: tts_pb2.SynthesizeSpeechResponse
+                response, call = stub.Synthesize.with_call(
+                    request,
+                    metadata=auth_metadata,
+                    timeout=dev_sf_settings.timeout,
+                )
+
+            # Save audio to file
+            Path(output_file).write_bytes(response.audio)
+            
+            # Verify that audio file was created and has content
+            assert os.path.exists(output_file), "AudioKit Dev SF English TTS output file was not created"
+            
+            file_size = os.path.getsize(output_file)
+            assert file_size > 1000, f"AudioKit Dev SF English TTS output file too small: {file_size} bytes"
+            
+            print(f"✅ AudioKit Dev SF English TTS test passed: Generated {file_size} bytes of audio for text '{test_text}' with voice '{voice_name}' (model: {model_type})")
+            print(f"   Endpoint: {dev_sf_settings.api_address}")
+            
+        finally:
+            # Clean up temporary file
+            if os.path.exists(output_file):
+                os.unlink(output_file)
+
+
 if __name__ == "__main__":
     # Allow running tests directly
     pytest.main([__file__, "-v"])
