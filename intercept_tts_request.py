@@ -3,12 +3,27 @@ import json
 from pathlib import Path
 from concurrent import futures
 from google.protobuf.json_format import MessageToJson
+import glob
 
-from audiogram_client.common_utils.config import Settings, CONFIG_FILE_PATHS
+from audiogram_client.common_utils.config import Settings
 # Corrected: We will implement the auth logic directly based on auth.py
 from audiogram_client.common_utils.auth import get_sso_access_token
 from audiogram_client.tts.utils.request import make_tts_request
 from audiogram_client.genproto.tts_pb2_grpc import TTSStub
+
+def find_configs_local():
+    """A local implementation to find config files."""
+    # Look for .ini files in common locations
+    home = Path.home()
+    paths = [
+        Path('.'),
+        home / '.config/audiogram_client',
+        home / '.audiogram_client'
+    ]
+    found_files = []
+    for path in paths:
+        found_files.extend(glob.glob(str(path / '*.ini')))
+    return found_files
 
 def intercept_tts_communication():
     """
@@ -17,21 +32,28 @@ def intercept_tts_communication():
     """
     print("--- 🔬 Intercepting TTS Request & Response ---")
 
-    # 1. Load Configuration
-    # Add default config paths to ensure all settings are loaded
-    all_configs = [str(config_path)] + CONFIG_FILE_PATHS
-    settings = Settings(all_configs)
+    # 1. Load Configuration for non-auth values
+    settings = Settings(settings_files=[str(Path('config_audiokit_dev_sf.ini'))])
 
-    # 2. Authenticate and get token
+    # 2. Authenticate and get token - Bypassing complex config loading for auth
     print("\nSTEP 1: Authenticating to get token...")
     try:
-        # Replicating the logic from get_authorization_metadata
+        # Direct values from config to bypass path resolution issues in dynaconf
+        sso_url = settings.get('sso_url', 'https://sso.dev.mts.ai')
+        realm = settings.get('realm', 'audiogram-demo')
+        client_id = settings.get('client_id')
+        client_secret = settings.get('client_secret')
+        verify_sso = settings.get('verify_sso', False)
+
+        if not all([client_id, client_secret]):
+            raise ValueError("client_id or client_secret not found in config_audiokit_dev_sf.ini")
+
         token = get_sso_access_token(
-            settings.sso_url,
-            settings.realm,
-            settings.client_id,
-            settings.client_secret,
-            settings.verify_sso,
+            sso_url,
+            realm,
+            client_id,
+            client_secret,
+            verify_sso,
         )
         auth_metadata = [('authorization', f'Bearer {token}')]
         print("✅ Authentication successful. Token metadata prepared.")
