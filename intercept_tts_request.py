@@ -6,7 +6,7 @@ from google.protobuf.json_format import MessageToJson
 
 from audiogram_client.common_utils.config import Settings
 # Corrected: We will implement the auth logic directly based on auth.py
-from audiogram_client.common_utils.auth import get_token
+from audiogram_client.common_utils.auth import get_sso_access_token
 from audiogram_client.tts.utils.request import make_tts_request
 from audiogram_client.genproto.tts_pb2_grpc import TTSStub
 
@@ -28,7 +28,13 @@ def intercept_tts_communication():
     print("\nSTEP 1: Authenticating to get token...")
     try:
         # Replicating the logic from get_authorization_metadata
-        token = get_token(settings)
+        token = get_sso_access_token(
+            settings.sso_url,
+            settings.realm,
+            settings.client_id,
+            settings.client_secret,
+            settings.verify_sso,
+        )
         auth_metadata = [('authorization', f'Bearer {token}')]
         print("✅ Authentication successful. Token metadata prepared.")
     except Exception as e:
