@@ -44,6 +44,11 @@ config copy.ini
 # Uncomment if you don't want to track config.ini
 config.ini
 
+# Certificate files
+*.pem
+*.crt
+*.key
+
 # Output files
 *.wav
 TTSOutput/
