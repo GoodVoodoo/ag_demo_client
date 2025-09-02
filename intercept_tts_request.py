@@ -4,7 +4,7 @@ from pathlib import Path
 from concurrent import futures
 from google.protobuf.json_format import MessageToJson
 
-from audiogram_client.common_utils.config import Settings
+from audiogram_client.common_utils.config import Settings, CONFIG_FILE_PATHS
 # Corrected: We will implement the auth logic directly based on auth.py
 from audiogram_client.common_utils.auth import get_sso_access_token
 from audiogram_client.tts.utils.request import make_tts_request
@@ -18,11 +18,9 @@ def intercept_tts_communication():
     print("--- 🔬 Intercepting TTS Request & Response ---")
 
     # 1. Load Configuration
-    config_path = Path('config_audiokit_dev_sf.ini')
-    if not config_path.exists():
-        print(f"❌ ERROR: Configuration file not found at '{config_path}'")
-        return
-    settings = Settings([str(config_path)])
+    # Add default config paths to ensure all settings are loaded
+    all_configs = [str(config_path)] + CONFIG_FILE_PATHS
+    settings = Settings(all_configs)
 
     # 2. Authenticate and get token
     print("\nSTEP 1: Authenticating to get token...")
