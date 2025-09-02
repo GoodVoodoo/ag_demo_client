@@ -123,7 +123,7 @@ export AUDIOGRAM_CLIENT_SECRET="your-client-secret"
 python -m audiogram_cli.main asr file --config config.ini --audio-file your_audio.wav --model e2e-v3 --enable-punctuator
 
 # Test TTS (Text-to-Speech) using CLI
-python -m audiogram_cli.main tts file --config config.ini --text "Hello world!" --output-file test.wav
+python -m audiogram_cli.main tts file --config config.ini --text 'Тест синтеза речи.' --voice-name <voice-name> --save-to test.wav
 
 # Test model listing
 python -c "
