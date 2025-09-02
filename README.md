@@ -15,6 +15,55 @@ This repository contains a set of demonstration clients for the Audiogram gRPC A
 - **[CLI Reference](docs/cli.md):** A detailed reference for the command-line interface.
 - **[Architecture Overview](docs/architecture.md):** An overview of the project structure and its core components.
 
+## 🚀 Installation & Setup
+
+### Prerequisites
+
+- Python 3.11+ (recommended: Python 3.13)
+- Git
+
+### Installation Steps
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd ag_demo_client
+   ```
+
+2. **Create and activate virtual environment:**
+   ```bash
+   # Create virtual environment
+   python -m venv venv
+   
+   # Activate virtual environment
+   # On macOS/Linux:
+   source venv/bin/activate
+   
+   # On Windows (PowerShell):
+   venv\Scripts\Activate.ps1
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   # Install from pyproject.toml (recommended)
+   pip install -e .
+   
+   # Or install development dependencies
+   pip install -e ".[dev]"
+   ```
+
+4. **Verify installation:**
+   ```bash
+   python -m audiogram_cli.main --help
+   ```
+
+### Important Notes
+
+- ✅ **Always activate the virtual environment** before using the CLI tools
+- ✅ **Use `pyproject.toml`** for dependency management (not requirements.txt)
+- ✅ **Keep virtual environment activated** for all audiogram commands
+- ❌ **Don't install dependencies globally** - use the virtual environment
+
 ## 🔒 Security & Credentials
 
 ### Quick Setup
@@ -62,15 +111,19 @@ Settings are loaded in this order (highest priority first):
 Verify your credentials are working:
 
 ```bash
+# Activate virtual environment first
+source venv/bin/activate  # macOS/Linux
+# or: venv\Scripts\Activate.ps1  # Windows PowerShell
+
 # Set your credentials in .env file or export them
 export AUDIOGRAM_CLIENT_ID="your-client-id"
 export AUDIOGRAM_CLIENT_SECRET="your-client-secret"
 
-# Test TTS (Text-to-Speech)
-python -m audiogram_client.tts.synthesize --config config.ini --text "Hello world!" --output-file test.wav
+# Test ASR (Speech Recognition) with punctuation using CLI
+python -m audiogram_cli.main asr file --config config.ini --audio-file your_audio.wav --model e2e-v3 --enable-punctuator
 
-# Test ASR (Speech Recognition) with punctuation
-python -m audiogram_client.asr.file_recognize --config config.ini --audio-file your_audio.wav --model e2e-v3 --enable-punctuator
+# Test TTS (Text-to-Speech) using CLI
+python -m audiogram_cli.main tts file --config config.ini --text "Hello world!" --output-file test.wav
 
 # Test model listing
 python -c "
@@ -140,83 +193,6 @@ python -m audiogram_cli.main --config config_audiokit_dev_sf.ini tts file --voic
 
 For comprehensive setup instructions, certificate configuration, and troubleshooting:
 - **[AUDIOKIT_DEV_SF_SETUP.md](AUDIOKIT_DEV_SF_SETUP.md)** - Complete AudioKit Dev SF configuration guide
-
-## 🧪 Testing
-
-### Integration Tests
-
-The project includes comprehensive integration tests for TTS and ASR functionality that verify real API interactions.
-
-#### Test Scenarios
-
-1. **TTS (Text-to-Speech) Test**
-   - Synthesizes Russian phrase: "Тестирование синтеза прошло успешно"
-   - Uses `gandzhaev` voice
-   - Validates audio file generation and quality
-
-2. **ASR (Automatic Speech Recognition) Test**
-   - Recognizes audio file `1297.wav` with punctuation enabled
-   - Uses `e2e-v3` model
-   - Validates transcription accuracy and punctuation
-
-3. **Model Service Test**
-   - Verifies model information retrieval
-   - Ensures API connectivity
-
-#### Running Tests
-
-**Option 1: Quick Test Script (Recommended)**
-```bash
-# Set your credentials
-export AUDIOGRAM_CLIENT_ID="your-client-id"
-export AUDIOGRAM_CLIENT_SECRET="your-client-secret"
-
-# Run the integration test script
-python run_integration_tests.py
-```
-
-**Option 2: Using pytest**
-```bash
-# Install dev dependencies
-pip install -e .[dev]
-
-# Run integration tests only
-pytest tests/test_integration.py -v -m integration
-
-# Run all tests
-pytest -v
-```
-
-#### Prerequisites
-
-Before running tests, ensure you have:
-
-- ✅ **Valid credentials** set as environment variables
-- ✅ **Configuration file** (`config.ini`) properly configured
-- ✅ **Test audio file** (`1297.wav`) present in project root
-- ✅ **Network connectivity** to Audiogram API endpoints
-
-#### Test Output
-
-The test script provides detailed, colored output showing:
-- ✅ Prerequisites check results
-- 🔄 Real-time test execution progress  
-- 📊 Individual test results with details
-- 📈 Summary with pass/fail statistics
-- 🎉 Clear success/failure indicators
-
-#### Troubleshooting Tests
-
-**Common Issues:**
-- **Authentication errors**: Check your `AUDIOGRAM_CLIENT_ID` and `AUDIOGRAM_CLIENT_SECRET`
-- **Network timeouts**: Verify API endpoints in `config.ini`
-- **Missing audio file**: Ensure `1297.wav` exists in project root
-- **Permission errors**: Check file system permissions for temporary files
-
-**Debug Mode:**
-```bash
-python run_integration_tests.py --verbose
-```
 
 ## Contributing
 

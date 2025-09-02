@@ -231,9 +231,13 @@ def print_recognize_response(response, is_file_response=False, text_file_output=
     # Print header information if available
     if hasattr(response, 'header') and response.header:
         click.echo("Response header:")
-        click.echo(f"  Request ID: {response.header.request_id}")
-        click.echo(f"  Status: {response.header.status}")
-        if response.header.error_message:
+        if hasattr(response.header, 'timestamp'):
+            click.echo(f"  Timestamp: {response.header.timestamp}")
+        if hasattr(response.header, 'request_id'):
+            click.echo(f"  Request ID: {response.header.request_id}")
+        if hasattr(response.header, 'status'):
+            click.echo(f"  Status: {response.header.status}")
+        if hasattr(response.header, 'error_message') and response.header.error_message:
             click.echo(f"  Error message: {response.header.error_message}")
         click.echo("")
     

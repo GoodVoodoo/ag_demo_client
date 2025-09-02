@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import cast
 
+import click
 import grpc
 
 from audiogram_client.common_utils.config import SettingsProtocol

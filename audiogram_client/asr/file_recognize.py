@@ -181,6 +181,12 @@ def file_recognize(
 
     click.echo(f"Connecting to gRPC server - {settings.api_address}\n")
 
+    # Create the request
+    request = stt_pb2.FileRecognizeRequest(
+        config=recognition_config,
+        audio=audio.blob,
+    )
+
     with open_grpc_channel(
         settings.api_address,
         ssl_creds_from_settings(settings),
