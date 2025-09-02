@@ -141,6 +141,83 @@ python -m audiogram_cli.main --config config_audiokit_dev_sf.ini tts file --voic
 For comprehensive setup instructions, certificate configuration, and troubleshooting:
 - **[AUDIOKIT_DEV_SF_SETUP.md](AUDIOKIT_DEV_SF_SETUP.md)** - Complete AudioKit Dev SF configuration guide
 
+## 🧪 Testing
+
+### Integration Tests
+
+The project includes comprehensive integration tests for TTS and ASR functionality that verify real API interactions.
+
+#### Test Scenarios
+
+1. **TTS (Text-to-Speech) Test**
+   - Synthesizes Russian phrase: "Тестирование синтеза прошло успешно"
+   - Uses `gandzhaev` voice
+   - Validates audio file generation and quality
+
+2. **ASR (Automatic Speech Recognition) Test**
+   - Recognizes audio file `1297.wav` with punctuation enabled
+   - Uses `e2e-v3` model
+   - Validates transcription accuracy and punctuation
+
+3. **Model Service Test**
+   - Verifies model information retrieval
+   - Ensures API connectivity
+
+#### Running Tests
+
+**Option 1: Quick Test Script (Recommended)**
+```bash
+# Set your credentials
+export AUDIOGRAM_CLIENT_ID="your-client-id"
+export AUDIOGRAM_CLIENT_SECRET="your-client-secret"
+
+# Run the integration test script
+python run_integration_tests.py
+```
+
+**Option 2: Using pytest**
+```bash
+# Install dev dependencies
+pip install -e .[dev]
+
+# Run integration tests only
+pytest tests/test_integration.py -v -m integration
+
+# Run all tests
+pytest -v
+```
+
+#### Prerequisites
+
+Before running tests, ensure you have:
+
+- ✅ **Valid credentials** set as environment variables
+- ✅ **Configuration file** (`config.ini`) properly configured
+- ✅ **Test audio file** (`1297.wav`) present in project root
+- ✅ **Network connectivity** to Audiogram API endpoints
+
+#### Test Output
+
+The test script provides detailed, colored output showing:
+- ✅ Prerequisites check results
+- 🔄 Real-time test execution progress  
+- 📊 Individual test results with details
+- 📈 Summary with pass/fail statistics
+- 🎉 Clear success/failure indicators
+
+#### Troubleshooting Tests
+
+**Common Issues:**
+- **Authentication errors**: Check your `AUDIOGRAM_CLIENT_ID` and `AUDIOGRAM_CLIENT_SECRET`
+- **Network timeouts**: Verify API endpoints in `config.ini`
+- **Missing audio file**: Ensure `1297.wav` exists in project root
+- **Permission errors**: Check file system permissions for temporary files
+
+**Debug Mode:**
+```bash
+python run_integration_tests.py --verbose
+```
+
 ## Contributing
 
 Contributions are welcome! Please see the `improvements.md` file for a list of planned improvements.
