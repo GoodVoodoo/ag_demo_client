@@ -194,6 +194,89 @@ python -m audiogram_cli.main --config config_audiokit_dev_sf.ini tts file --voic
 For comprehensive setup instructions, certificate configuration, and troubleshooting:
 - **[AUDIOKIT_DEV_SF_SETUP.md](AUDIOKIT_DEV_SF_SETUP.md)** - Complete AudioKit Dev SF configuration guide
 
+## 🧪 Integration Tests
+
+The project includes comprehensive integration tests to verify that TTS and ASR services work correctly with real API calls.
+
+### Test Scenarios
+
+The integration tests cover the following scenarios:
+
+1. **TTS Test**: Synthesizes the phrase "Тестирование синтеза прошло успешно" using the `gandzhaev` voice
+2. **ASR Test**: Recognizes the `1297.wav` audio file with punctuation enabled
+3. **Prerequisites**: Validates configuration, credentials, and required files
+
+### Running Integration Tests
+
+#### Quick Start
+
+Use the provided test runner script for the easiest testing experience:
+
+```bash
+# Activate virtual environment first
+source venv/bin/activate  # macOS/Linux
+# or: venv\Scripts\Activate.ps1  # Windows PowerShell
+
+# Set your credentials
+export AUDIOGRAM_CLIENT_ID="your-client-id"
+export AUDIOGRAM_CLIENT_SECRET="your-client-secret"
+
+# Run integration tests
+python run_integration_tests.py
+```
+
+#### Manual Testing with pytest
+
+You can also run tests manually using pytest:
+
+```bash
+# Run all integration tests
+python -m pytest tests/test_integration.py -v
+
+# Run specific test
+python -m pytest tests/test_integration.py::TestIntegration::test_tts_gandzhaev_voice -v
+python -m pytest tests/test_integration.py::TestIntegration::test_asr_with_punctuation -v
+
+# Run with detailed output
+python -m pytest tests/test_integration.py -v -s
+```
+
+### Test Requirements
+
+For integration tests to work, you need:
+
+- ✅ **Active virtual environment**
+- ✅ **Valid credentials** (AUDIOGRAM_CLIENT_ID, AUDIOGRAM_CLIENT_SECRET)
+- ✅ **Proper configuration** (`config.ini` file)
+- ✅ **Test audio file** (`1297.wav` must exist)
+- ✅ **Network connectivity** to Audiogram services
+
+### Test Output
+
+Successful test run shows:
+```
+🎉 All tests passed successfully!
+
+Test Results Summary:
+  ✅ TTS Test: Synthesized 'Тестирование синтеза прошло успешно' with gandzhaev voice
+  ✅ ASR Test: Recognized 1297.wav with punctuation enabled  
+  ✅ Prerequisites: Configuration and audio file validation
+
+The Audiogram services are working correctly! 🎯
+```
+
+### Troubleshooting Tests
+
+If tests fail, common issues include:
+
+- **Missing credentials**: Set `AUDIOGRAM_CLIENT_ID` and `AUDIOGRAM_CLIENT_SECRET`
+- **Network issues**: Check connectivity to `grpc.audiogram-demo.mts.ai:443`
+- **Missing files**: Ensure `1297.wav` and `config.ini` exist
+- **Voice unavailable**: Verify `gandzhaev` voice is accessible with your account
+- **Virtual environment**: Make sure you've activated the virtual environment
+
+For detailed error information, run tests with verbose output (`-v -s` flags).
+
 ## Contributing
 
 Contributions are welcome! Please see the `improvements.md` file for a list of planned improvements.
