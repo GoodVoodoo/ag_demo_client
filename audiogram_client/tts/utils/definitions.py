@@ -9,7 +9,7 @@ AUDIO_SAVE_CHANNELS: int = 1  # mono
 
 TEXT_ENCODING: Final = "utf-8"
 
-POSTPROCESSING_MODE: Final = tts_pb2.PostprocessingMode.POST_PROCESSING_DISABLE
+POSTPROCESSING_MODE: Final = tts_pb2.SynthesizeOptions.PostprocessingMode.POST_PROCESSING_DISABLE
 
 DEFAULT_VOICE: Final = "borisova"
 DEFAULT_SAMPLE_RATE: Final = 48000

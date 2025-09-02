@@ -5,8 +5,9 @@ These tests verify that the Audiogram services are working correctly with real A
 Tests require valid credentials to be configured.
 
 Test scenarios:
-1. TTS - synthesize phrase "Тестирование синтеза прошло успешно" using gandzhaev voice
-2. ASR - recognize 1297.wav with punctuation enabled
+1. Russian TTS - synthesize phrase "Тестирование синтеза прошло успешно" using gandzhaev voice
+2. English TTS - synthesize English phrase using voice 2 with eng voice model
+3. ASR - recognize 1297.wav with punctuation enabled
 """
 
 import os
@@ -124,6 +125,163 @@ class TestIntegration:
             # Clean up temporary file
             if os.path.exists(output_file):
                 os.unlink(output_file)
+
+    def test_tts_english_voice(self, settings):
+        """
+        Test English TTS synthesis with voice 2.
+        
+        Synthesizes an English phrase using voice 2 with the eng voice model
+        and verifies that audio is generated successfully.
+        """
+        from audiogram_client.tts.utils.request import make_tts_request
+        from audiogram_client.common_utils.auth import get_auth_metadata
+        from audiogram_client.common_utils.grpc import open_grpc_channel, ssl_creds_from_settings
+        from audiogram_client.genproto import tts_pb2, tts_pb2_grpc
+        
+        test_text = "Hello, this is an English text-to-speech integration test."
+        voice_name = "voice 2"
+        model_type = "eng voice"
+        
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+            output_file = temp_file.name
+        
+        try:
+            # Get auth metadata
+            auth_metadata = get_auth_metadata(
+                settings.sso_url,
+                settings.realm,
+                settings.client_id,
+                settings.client_secret,
+                settings.iam_account,
+                settings.iam_workspace,
+                settings.verify_sso,
+            )
+
+            # Create TTS request
+            request = make_tts_request(
+                text=test_text,
+                is_ssml=False,
+                voice_name=voice_name,
+                rate=22050,  # English voices support 22050 Hz
+                model_type=model_type,
+                model_rate=None,  # Auto-detect
+                voice_style=TTSVoiceStyle.neutral,
+                language_code=None,  # Use default (ru) as per model configuration
+            )
+
+            # Make gRPC call
+            with open_grpc_channel(
+                settings.api_address,
+                ssl_creds_from_settings(settings),
+            ) as channel:
+                stub = tts_pb2_grpc.TTSStub(channel)
+
+                response: tts_pb2.SynthesizeSpeechResponse
+                response, call = stub.Synthesize.with_call(
+                    request,
+                    metadata=auth_metadata,
+                    timeout=settings.timeout,
+                )
+
+            # Save audio to file
+            Path(output_file).write_bytes(response.audio)
+            
+            # Verify that audio file was created and has content
+            assert os.path.exists(output_file), "English TTS output file was not created"
+            
+            file_size = os.path.getsize(output_file)
+            assert file_size > 1000, f"English TTS output file too small: {file_size} bytes"
+            
+            print(f"✅ English TTS test passed: Generated {file_size} bytes of audio for text '{test_text}' with voice '{voice_name}' (model: {model_type})")
+            
+        finally:
+            # Clean up temporary file
+            if os.path.exists(output_file):
+                os.unlink(output_file)
+
+    def test_tts_multiple_english_voices(self, settings):
+        """
+        Test multiple English voices to ensure variety works.
+        
+        Tests voice 1 and voice 3 in addition to voice 2 to verify
+        that different English voices are accessible and working.
+        """
+        from audiogram_client.tts.utils.request import make_tts_request
+        from audiogram_client.common_utils.auth import get_auth_metadata
+        from audiogram_client.common_utils.grpc import open_grpc_channel, ssl_creds_from_settings
+        from audiogram_client.genproto import tts_pb2, tts_pb2_grpc
+        
+        test_voices = [
+            ("voice 1", "Testing English voice one with natural pronunciation."),
+            ("voice 3", "Testing English voice three for variety and quality."),
+        ]
+        
+        # Get auth metadata once
+        auth_metadata = get_auth_metadata(
+            settings.sso_url,
+            settings.realm,
+            settings.client_id,
+            settings.client_secret,
+            settings.iam_account,
+            settings.iam_workspace,
+            settings.verify_sso,
+        )
+        
+        successful_voices = []
+        
+        for voice_name, test_text in test_voices:
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+                output_file = temp_file.name
+            
+            try:
+                # Create TTS request
+                request = make_tts_request(
+                    text=test_text,
+                    is_ssml=False,
+                    voice_name=voice_name,
+                    rate=22050,  # English voices support 22050 Hz
+                    model_type="eng voice",
+                    model_rate=None,  # Auto-detect
+                    voice_style=TTSVoiceStyle.neutral,
+                    language_code=None,  # Use default (ru) as per model configuration
+                )
+
+                # Make gRPC call
+                with open_grpc_channel(
+                    settings.api_address,
+                    ssl_creds_from_settings(settings),
+                ) as channel:
+                    stub = tts_pb2_grpc.TTSStub(channel)
+
+                    response: tts_pb2.SynthesizeSpeechResponse
+                    response, call = stub.Synthesize.with_call(
+                        request,
+                        metadata=auth_metadata,
+                        timeout=settings.timeout,
+                    )
+
+                # Save audio to file
+                Path(output_file).write_bytes(response.audio)
+                
+                # Verify that audio file was created and has content
+                assert os.path.exists(output_file), f"English TTS output file was not created for {voice_name}"
+                
+                file_size = os.path.getsize(output_file)
+                assert file_size > 1000, f"English TTS output file too small for {voice_name}: {file_size} bytes"
+                
+                successful_voices.append((voice_name, file_size))
+                
+            finally:
+                # Clean up temporary file
+                if os.path.exists(output_file):
+                    os.unlink(output_file)
+        
+        # Verify that we successfully tested at least one additional voice
+        assert len(successful_voices) >= 1, f"Failed to test any additional English voices"
+        
+        print(f"✅ Multiple English voices test passed: Successfully tested {len(successful_voices)} voices:")
+        for voice_name, file_size in successful_voices:
+            print(f"   - {voice_name}: {file_size} bytes")
 
     def test_asr_with_punctuation(self, settings, test_audio_file):
         """
