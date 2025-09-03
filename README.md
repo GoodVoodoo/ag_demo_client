@@ -8,12 +8,14 @@ This repository contains a set of demonstration clients for the Audiogram gRPC A
 - **🗣️ Text-to-Speech (TTS)** - Generate natural-sounding speech from text in Russian and English
 - **🎙️ Voice Cloning** - Clone voices and use them for TTS (AudioKit Dev SF instance)
 - **📝 Punctuator** - Automatic punctuation and capitalization in transcriptions
+- **📊 Universal Logging System** - Professional-grade logging for ALL operations with automatic rotation
 
 ## Documentation
 
 - **[Quickstart Guide](docs/quickstart.md):** Learn how to install, configure, and use the clients.
 - **[CLI Reference](docs/cli.md):** A detailed reference for the command-line interface.
 - **[Architecture Overview](docs/architecture.md):** An overview of the project structure and its core components.
+- **[Universal Logging System](UNIVERSAL_LOGGING_SYSTEM_README.md):** Complete documentation for professional logging across all operations.
 
 ## 🚀 Installation & Setup
 
@@ -243,7 +245,8 @@ asr file --config config.ini --audio-file your_audio.wav --model e2e-v3 --enable
 python -m audiogram_cli.main tts file --config config.ini --text 'Тест синтеза речи.' --voice-name borisova --save-to test_russian.wav
 
 # English TTS (specialized English voices)  
-python -m audiogram_cli.main tts file --config config.ini --text 'Hello, this is an English text-to-speech test.' --voice-name 'voice 2' --model-type 'eng voice' --sample-rate 22050 --save-to test_english.wav
+python -m audiogram_cli.main tts file --config config.ini --text 'Hello, this is an English text-to-speech test.'
+ --save-to test_english.wav
 
 # Test model listing
 python -c "
