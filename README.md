@@ -12,10 +12,20 @@ This repository contains a set of demonstration clients for the Audiogram gRPC A
 
 ## Documentation
 
+### **📖 Core Documentation**
 - **[Quickstart Guide](docs/quickstart.md):** Learn how to install, configure, and use the clients.
 - **[CLI Reference](docs/cli.md):** A detailed reference for the command-line interface.
 - **[Architecture Overview](docs/architecture.md):** An overview of the project structure and its core components.
+
+### **🔧 Advanced Features**
 - **[Universal Logging System](UNIVERSAL_LOGGING_SYSTEM_README.md):** Complete documentation for professional logging across all operations.
+- **[Security Setup](SECURITY_SETUP.md):** Complete security configuration guide.
+- **[AudioKit Dev SF Setup](AUDIOKIT_DEV_SF_SETUP.md):** Voice cloning setup for AudioKit Dev SF instance.
+
+### **🛠️ Troubleshooting**
+- **[ALPN Troubleshooting](ALPN_TROUBLESHOOTING_STEPS.md):** Steps to resolve ALPN/gRPC configuration issues.
+- **[Support Request Template](AUDIOKIT_DEV_SF_SUPPORT_REQUEST.md):** Template for contacting AudioKit Dev SF support.
+- **[Technical Analysis](docs/technical-analysis/TECHNICAL_ANALYSIS_INDEX.md):** Detailed technical troubleshooting documentation.
 
 ## 🚀 Installation & Setup
 
@@ -263,8 +273,8 @@ print(f'✅ Success! Found {len(models)} models')
 ### Detailed Setup Instructions
 
 For complete setup instructions, troubleshooting, and security best practices, see:
-- **[SECURITY_SETUP.md](SECURITY_SETUP.md)** - Complete security configuration guide
-- **[SECURITY_IMPLEMENTATION_SUMMARY.md](SECURITY_IMPLEMENTATION_SUMMARY.md)** - Implementation details
+- **[Security Setup Guide](SECURITY_SETUP.md)** - Complete security configuration guide
+- **[Security Implementation](SECURITY_IMPLEMENTATION_SUMMARY.md)** - Implementation details
 
 ## 🎤 Voice Cloning (AudioKit Dev SF Instance)
 
