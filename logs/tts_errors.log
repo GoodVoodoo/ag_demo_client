@@ -1,0 +1,2 @@
+2025-09-03 10:05:22 | ERROR    | tts_utility | log_request_error:200 | {"request_id": "req_1756883112_0001", "event": "request_error", "timestamp": "2025-09-03T10:05:22.955378", "duration_ms": 10036.460876464844, "error": {"error_type": "FutureTimeoutError", "error_message": ""}}
+2025-09-03 10:05:22 | ERROR    | tts_utility | log_request_error:201 | Request req_1756883112_0001 failed after 10036.46ms: 
